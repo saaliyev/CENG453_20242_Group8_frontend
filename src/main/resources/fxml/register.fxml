@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<?import javafx.scene.text.Text?>
+<VBox spacing="10" alignment="CENTER" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.demo.client.RegisterController">
+    <padding><Insets top="20" bottom="20" left="20" right="20"/></padding>
+
+    <Label text="Register to UNO" style="-fx-font-size: 20px;"/>
+    <TextField fx:id="usernameField" promptText="Username"/>
+    <PasswordField fx:id="passwordField" promptText="Password"/>
+    <PasswordField fx:id="confirmPasswordField" promptText="Confirm Password"/>
+    <Text fx:id="messageText"/>
+    <Button text="Register" onAction="#onRegister"/>
+    <Button text="Go to Login" onAction="#goToLogin"/>
+</VBox>
