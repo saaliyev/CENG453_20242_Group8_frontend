@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.demo.client.ModeSelectionController"
+      alignment="CENTER" spacing="20"
+      style="-fx-background-color: #f2f2f2;">
+
+    <padding>
+        <Insets top="30" right="30" bottom="30" left="30"/>
+    </padding>
+
+    <HBox spacing="40" alignment="CENTER">
+        <VBox alignment="CENTER" spacing="10">
+            <ImageView fx:id="singleImage" fitHeight="150" fitWidth="150">
+                <image>
+                    <Image url="@/images/singleplayer.png" />
+                </image>
+            </ImageView>
+            <Button text="Single Player" onAction="#handleSinglePlayer"/>
+        </VBox>
+
+        <VBox alignment="CENTER" spacing="10">
+            <ImageView fx:id="multiImage" fitHeight="150" fitWidth="150">
+                <image>
+                    <Image url="@/images/multiplayer.png" />
+                </image>
+            </ImageView>
+            <Button text="Multiplayer" onAction="#handleMultiplayer"/>
+        </VBox>
+    </HBox>
+</VBox>
