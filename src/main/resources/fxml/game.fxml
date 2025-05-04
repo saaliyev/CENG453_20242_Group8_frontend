@@ -10,6 +10,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Text?>
 
+<?import javafx.scene.layout.Region?>
 <BorderPane fx:id="rootPane"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.demo.client.GameController"
@@ -45,6 +46,12 @@
     <!-- Center: Draw pile, play pile, and direction image -->
     <center>
         <VBox alignment="CENTER" spacing="10">
+            <VBox fx:id="colorPicker" alignment="CENTER" spacing="10" visible="false" managed="false">
+                <Button text="Red"    style="-fx-background-color: red;    -fx-text-fill: white;" onAction="#onColorRed"/>
+                <Button text="Yellow" style="-fx-background-color: yellow; -fx-text-fill: black;" onAction="#onColorYellow"/>
+                <Button text="Green"  style="-fx-background-color: green;  -fx-text-fill: white;" onAction="#onColorGreen"/>
+                <Button text="Blue"   style="-fx-background-color: blue;   -fx-text-fill: white;" onAction="#onColorBlue"/>
+            </VBox>
             <ImageView fx:id="directionImage"
                        fitWidth="60" fitHeight="60"
                        style="-fx-effect: dropshadow(gaussian, black, 4, 0.5, 0, 0);" />
@@ -53,6 +60,7 @@
                 <StackPane alignment="CENTER">
                     <ImageView fx:id="pileImage" />
                 </StackPane>
+                <Region fx:id="gameColorIndicator" prefWidth="30" prefHeight="30" style="-fx-background-color: gray; -fx-border-color: black; -fx-border-radius: 5; -fx-background-radius: 5;" />
             </HBox>
         </VBox>
     </center>

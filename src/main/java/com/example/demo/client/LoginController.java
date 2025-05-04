@@ -27,6 +27,7 @@ public class LoginController {
             String response = ApiClient.post("/auth/login", json.toString());
             System.out.println("Login response: " + response); // debug
             messageText.setText("Login successful!");
+            SceneManager.switchTo("mode_selection.fxml");
         } catch (Exception e) {
             System.out.println("Login failed: " + e.getMessage()); // debug
             messageText.setText("Login failed: " + e.getMessage());

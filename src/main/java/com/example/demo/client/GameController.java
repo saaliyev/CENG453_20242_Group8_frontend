@@ -9,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -35,8 +36,12 @@ public class GameController implements Initializable {
     @FXML private ToggleButton unoToggleTop;
     @FXML private ToggleButton unoToggleRight;
     @FXML private ImageView directionImage;
+    @FXML private Region gameColorIndicator;
+    @FXML private VBox colorPicker;
+    private boolean gameEnded= false;
 
 
+    private int gameColor = -1;
     private final List<ImageView> allHandCards = new ArrayList<>();
 
     private static final double CARD_WIDTH = 140;
@@ -47,6 +52,7 @@ public class GameController implements Initializable {
     private List<String> leftOpponentCards = List.of();
     private List<String> topOpponentCards = List.of();
     private List<String> rightOpponentCards = List.of();
+    private int Index=0;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -107,39 +113,45 @@ public class GameController implements Initializable {
 
         // Start polling game state in a background thread
         Thread gameStatePollingThread = new Thread(() -> {
-            String lastResponse = null;
-            while (true) {
-                try {
-                    String newResponse = ApiClient.get("/game/state");
-                    if (!newResponse.equals(lastResponse)) {
-                        lastResponse = newResponse;
-                        JSONObject jsonState = new JSONObject(newResponse);
-                        Platform.runLater(() -> {
-                            try {
-                                updateGameState(jsonState);
-                            } catch (Exception e) {
-                                System.out.println("Failed to update game state: " + e.getMessage());
-                            }
-                        });
+
+                String lastResponse = null;
+                while (!gameEnded) {
+                    try {
+                        String newResponse = ApiClient.get("/game/state");
+                        System.out.println(newResponse);
+                        if (!newResponse.equals(lastResponse)) {
+                            lastResponse = newResponse;
+                            JSONObject jsonState = new JSONObject(newResponse);
+                            Platform.runLater(() -> {
+                                try {
+                                    updateGameState(jsonState);
+                                } catch (Exception e) {
+                                    System.out.println("Failed to update game state: " + e.getMessage());
+                                }
+                            });
+                        }
+                        Thread.sleep(1000); // 1 second polling interval
+                    } catch (IOException | InterruptedException e) {
+                        System.out.println("Polling error: " + e.getMessage());
+                        break;
                     }
-                    Thread.sleep(1000); // 1 second polling interval
-                } catch (IOException | InterruptedException e) {
-                    System.out.println("Polling error: " + e.getMessage());
-                    break;
                 }
-            }
         });
         gameStatePollingThread.setDaemon(true);
         gameStatePollingThread.start();
     }
 
     private void updateGameState(JSONObject json2) {
+        gameEnded = json2.getBoolean("gameEnded");
         this.playerCards = jsonArrayToList(json2.getJSONArray("player0CardPaths"));
         this.leftOpponentCards = jsonArrayToList(json2.getJSONArray("player3CardPaths"));
         this.topOpponentCards = jsonArrayToList(json2.getJSONArray("player2CardPaths"));
         this.rightOpponentCards = jsonArrayToList(json2.getJSONArray("player1CardPaths"));
 
         setDirection(json2.getInt("direction") == 1);
+        gameColor= json2.getInt("gameColor");
+        updateGameColorIndicator(gameColor);
+        System.out.println("Game Color " + gameColor);
         pileImage.setImage(new Image(getClass().getResourceAsStream(json2.getString("pileTopImagePath"))));
         pileImage.setFitWidth(CARD_WIDTH);
         pileImage.setFitHeight(CARD_HEIGHT);
@@ -174,22 +186,32 @@ public class GameController implements Initializable {
         iv.toFront();
         iv.setStyle(isClickable ? "-fx-cursor: hand;" : "-fx-cursor: default;");
 
-        // Add event handler to capture the index of the clicked card
         iv.setOnMouseClicked(event -> {
             System.out.println("Card clicked! Index: " + index + ", Path: " + path);
 
-            // Create the JSON payload
             JSONObject json = new JSONObject();
-            json.put("playerName",  playerName); // Replace with the actual player name
-            json.put("actionType", index); // The index of the clicked card
+            json.put("playerName", playerName);
+            json.put("actionType", index);
 
-            // Send the POST request with the JSON payload
-            try {
-                String response = ApiClient.post("/game/match/makeMove", json.toString());
-                System.out.println("Response from backend: " + response);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                if (path.endsWith("uno_card-wildchange.png") || path.endsWith("uno_card-wilddraw4.png")) {
+                    Index= index;
+                    colorPicker.setVisible(true);
+                    colorPicker.setManaged(true);
+                }
+                else {
+                    new Thread(() -> {
+                        try {
+                            ApiClient.post("/game/match/makeMove", json.toString()); // no need to read response
+                        } catch (Exception e) {
+                            System.out.println("Error making move: " + e.getMessage());
+                        }
+                    }).start();
+                }
+
+
+
+
+                // Check if the card is a wild card
 
             event.consume(); // Prevent further propagation
         });
@@ -260,4 +282,53 @@ public class GameController implements Initializable {
         }
         return list;
     }
+    private void updateGameColorIndicator(int color) {
+        String fxColor;
+        switch (color) {
+            case 0 -> fxColor = "red";
+            case 1 -> fxColor = "yellow";
+            case 2 -> fxColor = "green";
+            case 3 -> fxColor = "blue";
+            default -> fxColor = "gray";
+        }
+        gameColorIndicator.setStyle("-fx-background-color: " + fxColor + "; -fx-border-color: black; -fx-border-radius: 5; -fx-background-radius: 5;");
+    }
+
+    @FXML private void onColorRed() throws IOException {
+        sendColorChoice(0);  // Red
+    }
+    @FXML private void onColorYellow() throws IOException {
+        sendColorChoice(1);  // Yellow
+    }
+    @FXML private void onColorGreen() throws IOException {
+        sendColorChoice(2);  // Green
+    }
+    @FXML private void onColorBlue() throws IOException {
+        sendColorChoice(3);  // Blue
+    }
+
+    private void sendColorChoice(int color) throws IOException {
+        System.out.println("girdi bura" );
+        JSONObject json = new JSONObject();
+        json.put("playerName", playerName);
+        json.put("actionType", Index);
+
+        String response = ApiClient.post("/game/match/makeMove", json.toString());
+        System.out.println("Response from backend: " + response);
+        JSONObject colorJson = new JSONObject();
+        colorJson.put("playerName", playerName);
+        colorJson.put("actionType", color - 4);  // Adjust as your backend expects
+
+        try {
+            String colorResponse = ApiClient.post("/game/match/makeMove", colorJson.toString());
+            System.out.println("Color chosen response: " + colorResponse);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        colorPicker.setVisible(false);
+        colorPicker.setManaged(false);
+    }
+
+
 }
