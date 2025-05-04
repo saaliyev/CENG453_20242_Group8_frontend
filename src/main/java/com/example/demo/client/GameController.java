@@ -140,7 +140,8 @@ public class GameController implements Initializable {
                         break;
                     }
                 }
-                SceneManager.switchTo("/lobby.fxml");
+                Platform.runLater(() -> SceneManager.switchTo("/lobby.fxml"));
+
         });
         gameStatePollingThread.setDaemon(true);
         gameStatePollingThread.start();

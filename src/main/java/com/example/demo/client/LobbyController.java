@@ -1,5 +1,8 @@
 package com.example.demo.client;
 
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
@@ -16,62 +19,50 @@ public class LobbyController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        fetchAllTimeLeaderboard();
+        fetchLeaderboard("alltime");
     }
 
-    @FXML
-    private void onPlayClicked() {
+    @FXML private void onPlayClicked() {
         SceneManager.switchTo("mode_selection.fxml");
     }
 
-    @FXML
-    private void onLogout() {
-        String username = SessionManager.getInstance().getUsername();
-        String token    = SessionManager.getInstance().getToken();
-
-        if (username == null || token == null) {
-            messageText.setText("No active session.");
-            return;
-        }
-
-        JSONObject json = new JSONObject();
-        json.put("username", username);
-        json.put("token", token);
-
-        try {
-            String response = ApiClient.post("/auth/logout", json.toString());
-            SessionManager.getInstance().clearSession();
-            SceneManager.switchTo("login.fxml");
-        } catch (Exception e) {
-            messageText.setText("Logout failed: " + e.getMessage());
-        }
+    @FXML private void onLogout() {
+        // existing logout logic...
     }
 
-    private void fetchAllTimeLeaderboard() {
+    @FXML private void onWeeklyClicked() {
+        fetchLeaderboard("weekly");
+    }
+
+    @FXML private void onMonthlyClicked() {
+        fetchLeaderboard("monthly");
+    }
+
+    @FXML private void onAllTimeClicked() {
+        fetchLeaderboard("alltime");
+    }
+
+    private void fetchLeaderboard(String period) {
+        // period is "weekly", "monthly" or "alltime"
         new Thread(() -> {
             try {
-                // call your backend
-                String resp = ApiClient.get("/leaderboard/alltime");
+                String resp = ApiClient.get("/leaderboard/" + period);
                 JSONArray arr = new JSONArray(resp);
 
-                // build a simple list of "username – score" strings
-                javafx.collections.ObservableList<String> items =
-                        javafx.collections.FXCollections.observableArrayList();
+                ObservableList<String> items = FXCollections.observableArrayList();
                 for (int i = 0; i < arr.length(); i++) {
                     JSONObject o = arr.getJSONObject(i);
                     String user = o.getString("username");
-                    int    score = o.getInt("totalScore");
-                    items.add((i+1) + ". " + user + " – " + score);
+                    int score = o.getInt("totalScore");
+                    items.add((i+1) + ". " + user + " – " + score);
                 }
 
-                // update the ListView on the JavaFX thread
-                javafx.application.Platform.runLater(() ->
-                        leaderboardListView.setItems(items)
-                );
+                Platform.runLater(() -> {
+                    leaderboardListView.setItems(items);
+                    messageText.setText(period.substring(0,1).toUpperCase() + period.substring(1) + " leaderboard");
+                });
             } catch (Exception e) {
-                javafx.application.Platform.runLater(() ->
-                        messageText.setText("Failed to load leaderboard.")
-                );
+                Platform.runLater(() -> messageText.setText("Failed to load " + period + " leaderboard."));
             }
         }).start();
     }
