@@ -2,7 +2,7 @@
 
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ToggleButton?>
+<!--<?import javafx.scene.control.ToggleButton?>-->
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -10,91 +10,208 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Text?>
 
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.shape.Circle?>
 <BorderPane fx:id="rootPane"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.demo.client.GameController"
-            style="-fx-background-color: #0236f5;"
+            style="-fx-background-color: #0df5da;"
             prefWidth="900" prefHeight="700">
 
+    <!-- Top: Top opponent hand and title -->
     <top>
         <VBox fx:id="topContainer" alignment="CENTER" spacing="10"
               minHeight="160" prefHeight="200" maxHeight="340">
             <HBox fx:id="topHand" alignment="CENTER" spacing="10" />
-            <ToggleButton fx:id="unoToggleTop" text="Top: UNO!" disable="true"
-                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />
-            <Text text="UNO Game" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+<!--            <ToggleButton fx:id="unoToggleTop" text="Top: UNO!" disable="true"-->
+<!--                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />-->
+            <Text text="" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
         </VBox>
     </top>
 
+    <!-- Bottom: Player hand and UNO toggle -->
+    <bottom>
+        <VBox alignment="CENTER" spacing="5">
+<!--            <ToggleButton fx:id="unoTogglePlayer" text="You: UNO!" onAction="#onUnoTogglePlayer"-->
+<!--                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />-->
+            <HBox fx:id="bottomContainer" alignment="CENTER" spacing="20"
+                  minHeight="160" prefHeight="180" maxHeight="260">
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
+                <HBox fx:id="playerHand" alignment="CENTER" spacing="10" HBox.hgrow="ALWAYS" />
+            </HBox>
+        </VBox>
+    </bottom>
+
     <center>
-        <HBox alignment="CENTER" spacing="20">
-            <ImageView fx:id="backCardImage" />
-            <StackPane alignment="CENTER">
-                <ImageView fx:id="pileImage" />
+        <StackPane fx:id="centerStack" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" alignment="CENTER">
+
+            <!-- Game UI -->
+            <VBox alignment="CENTER" spacing="10">
+                <VBox fx:id="colorPicker" alignment="CENTER" spacing="10" visible="false" managed="false">
+                    <Button text="Red"    style="-fx-background-color: red;    -fx-text-fill: white;" onAction="#onColorRed"/>
+                    <Button text="Yellow" style="-fx-background-color: yellow; -fx-text-fill: black;" onAction="#onColorYellow"/>
+                    <Button text="Green"  style="-fx-background-color: green;  -fx-text-fill: white;" onAction="#onColorGreen"/>
+                    <Button text="Blue"   style="-fx-background-color: blue;   -fx-text-fill: white;" onAction="#onColorBlue"/>
+                </VBox>
+                <VBox fx:id="debugActionButtons" alignment="CENTER" spacing="10" translateY="-50" translateX="300">
+                    <Button text="Trigger Skip"           style="-fx-background-color: #1abc9c; -fx-text-fill: white;" onAction="#onSkipClicked"/>
+                    <Button text="Trigger Wild"           style="-fx-background-color: #9b59b6; -fx-text-fill: white;" onAction="#onWildClicked"/>
+                    <Button text="Trigger Reverse"        style="-fx-background-color: #e67e22; -fx-text-fill: white;" onAction="#onReverseClicked"/>
+                    <Button text="Trigger Draw 2"         style="-fx-background-color: #f1c40f; -fx-text-fill: black;" onAction="#onDraw2Clicked"/>
+                    <Button text="Trigger Wild Draw 4"    style="-fx-background-color: #e74c3c; -fx-text-fill: white;" onAction="#onWildDraw4Clicked"/>
+                </VBox>
+
+
+                <ImageView fx:id="directionImage"
+                           fitWidth="60" fitHeight="60"
+                           style="-fx-effect: dropshadow(gaussian, black, 4, 0.5, 0, 0);" />
+                <HBox alignment="CENTER" spacing="20">
+                    <ImageView fx:id="backCardImage" />
+                    <StackPane alignment="CENTER">
+                        <ImageView fx:id="pileImage" />
+                    </StackPane>
+                    <Region fx:id="gameColorIndicator"
+                            prefWidth="30" prefHeight="30"
+                            style="-fx-background-color: gray;
+                           -fx-border-color: black;
+                           -fx-border-radius: 5;
+                           -fx-background-radius: 5;" />
+                </HBox>
+            </VBox>
+
+            <!-- Dots for player positions -->
+            <Circle fx:id="dotTop"
+                    radius="15"
+                    style="-fx-fill: red;"
+                    StackPane.alignment="TOP_CENTER"
+                    translateY="10"/>
+            <Circle fx:id="dotRight"
+                    radius="15"
+                    style="-fx-fill: red;"
+                    StackPane.alignment="CENTER_RIGHT"
+                    translateX="-15"/>
+            <Circle fx:id="dotBottom"
+                    radius="15"
+                    style="-fx-fill: red;"
+                    StackPane.alignment="BOTTOM_CENTER"
+                    translateY="-10"/>
+            <Circle fx:id="dotLeft"
+                    radius="15"
+                    style="-fx-fill: red;"
+                    StackPane.alignment="CENTER_LEFT"
+                    translateX="15"/>
+
+            <!-- UNO indicators -->
+            <StackPane fx:id="unoIndicatorTop"
+                       visible="false"
+                       managed="false"
+                       mouseTransparent="true"
+                       pickOnBounds="false"
+                       StackPane.alignment="TOP_CENTER"
+                       translateY="250">
+                <Circle radius="20"
+                        style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;"
+                        mouseTransparent="true"/>
+                <Text text="UNO"
+                      style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"
+                      mouseTransparent="true"/>
             </StackPane>
-        </HBox>
+
+            <StackPane fx:id="unoIndicatorRight"
+                       visible="false" managed="false"
+                       mouseTransparent="true"
+                       StackPane.alignment="CENTER_RIGHT"
+                       translateX="205">
+                <Circle radius="20"
+                        style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;"
+                        mouseTransparent="true"/>
+                <Text text="UNO"
+                      style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"
+                      mouseTransparent="true"/>
+            </StackPane>
+
+            <StackPane fx:id="unoIndicatorBottom"
+                       visible="false" managed="false"
+                       mouseTransparent="true"
+                       StackPane.alignment="BOTTOM_CENTER"
+                       translateY="-250">
+                <Circle radius="20"
+                        style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;"
+                        mouseTransparent="true"/>
+                <Text text="UNO"
+                      style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"
+                      mouseTransparent="true"/>
+            </StackPane>
+
+            <StackPane fx:id="unoIndicatorLeft"
+                       visible="false" managed="false"
+                       mouseTransparent="true"
+                       StackPane.alignment="CENTER_LEFT"
+                       translateX="250">
+                <Circle radius="20"
+                        style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;"
+                        mouseTransparent="true"/>
+                <Text text="UNO"
+                      style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"
+                      mouseTransparent="true"/>
+            </StackPane>
+
+
+
+        </StackPane>
+
     </center>
 
+
+    <!-- Left: Left opponent hand and player action buttons -->
     <left>
-        <HBox alignment="CENTER_LEFT">
+        <VBox alignment="CENTER_LEFT" spacing="10">
             <VBox fx:id="leftHand" alignment="CENTER" spacing="10"
                   minWidth="160" prefWidth="180" maxWidth="460">
                 <padding>
                     <Insets top="10" right="0" bottom="10" left="10"/>
                 </padding>
             </VBox>
-            <ToggleButton fx:id="unoToggleLeft" text="Left: UNO!" disable="true"
-                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />
-        </HBox>
+<!--            <ToggleButton fx:id="unoToggleLeft" text="Left: UNO!" disable="true"-->
+<!--                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />-->
+            <VBox fx:id="bottomLeftButtons" spacing="10">
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
+
+
+            </VBox>
+        </VBox>
     </left>
 
+    <!-- Right: Right opponent hand and UNO toggle -->
     <right>
-        <HBox alignment="CENTER_RIGHT">
-            <ToggleButton fx:id="unoToggleRight" text="Right: UNO!" disable="true"
-                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />
+        <VBox alignment="CENTER_RIGHT" spacing="10">
+<!--            <ToggleButton fx:id="unoToggleRight" text="Right: UNO!" disable="true"-->
+<!--                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />-->
             <VBox fx:id="rightHand" alignment="CENTER" spacing="10"
                   minWidth="160" prefWidth="180" maxWidth="260">
                 <padding>
                     <Insets top="10" right="10" bottom="10" left="0"/>
                 </padding>
             </VBox>
-        </HBox>
+        </VBox>
     </right>
 
-    <bottom>
-        <StackPane>
-            <!-- Center bottom game area -->
-            <VBox alignment="CENTER" spacing="5">
-                <ToggleButton fx:id="unoTogglePlayer" text="You: UNO!" onAction="#onUnoTogglePlayer"
-                              style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />
-                <HBox fx:id="bottomContainer" alignment="CENTER" spacing="20"
-                      minHeight="160" prefHeight="180" maxHeight="260">
-                    <padding>
-                        <Insets top="10" right="10" bottom="10" left="10"/>
-                    </padding>
-                    <StackPane HBox.hgrow="ALWAYS">
-                        <HBox fx:id="playerHand" alignment="CENTER" spacing="10" />
-                    </StackPane>
-                </HBox>
-            </VBox>
-
-            <!-- Bottom-left control buttons -->
-            <VBox fx:id="bottomLeftButtons" spacing="10"
-                  StackPane.alignment="BOTTOM_LEFT"
-                  translateX="20" translateY="-20">
-                <Button text="Skip" onAction="#onSkipClicked" />
-                <Button text="Reverse" onAction="#onReverseClicked" />
-                <Button text="Draw two" onAction="#onDraw2Clicked" />
-                <Button text="Wild" onAction="#onWildClicked" />
-                <Button text="Wild Draw four" onAction="#onWildDraw4Clicked" />
-            </VBox>
-
-            <!-- Bottom-right direction indicator -->
-            <ImageView fx:id="directionImage"
-                       fitWidth="100" fitHeight="100"
-                       StackPane.alignment="BOTTOM_RIGHT"
-                       translateX="-40" translateY="-40"/>
-        </StackPane>
-    </bottom>
-
+    <Button text="Skip" onAction="#onSkipClicked" />
+    <Button text="Reverse" onAction="#onReverseClicked" />
+    <Button text="Draw two" onAction="#onDraw2Clicked" />
+    <Button text="Wild" onAction="#onWildClicked" />
+    <Button text="Wild Draw four" onAction="#onWildDraw4Clicked" />
+    <VBox fx:id="gameOverOverlay"
+          alignment="CENTER"
+          visible="false"
+          style="-fx-background-color: rgba(0, 0, 0, 0.7);"
+          spacing="20"
+          prefWidth="800" prefHeight="600">
+        <Text fx:id="winnerText" style="-fx-fill: white; -fx-font-size: 24px;"/>
+        <Text fx:id="scoreText"  style="-fx-fill: white; -fx-font-size: 18px;"/>
+    </VBox>
 </BorderPane>

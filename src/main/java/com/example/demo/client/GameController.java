@@ -1,15 +1,17 @@
 package com.example.demo.client;
 
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
+import javafx.util.Duration;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -20,45 +22,29 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class GameController implements Initializable {
+    String playerName = "";
+    @FXML private BorderPane rootPane;
+    @FXML private VBox topContainer;
+    @FXML private HBox bottomContainer;
+    @FXML private HBox playerHand;
+    @FXML private VBox leftHand;
+    @FXML private VBox rightHand;
+    @FXML private HBox topHand;
+    @FXML private ImageView pileImage;
+    @FXML private ImageView backCardImage;
+    @FXML private StackPane unoIndicatorTop;
+    @FXML private StackPane unoIndicatorRight;
+    @FXML private StackPane unoIndicatorBottom;
+    @FXML private StackPane unoIndicatorLeft;
+    @FXML private ImageView directionImage;
+    @FXML private Region gameColorIndicator;
+    @FXML private VBox colorPicker;
+    private boolean gameEnded= false;
+    private int turn=0;
+    private String winner= "";
+    private int score=0;
 
-    @FXML
-    private BorderPane rootPane;
-    @FXML
-    private VBox topContainer;
-    @FXML
-    private HBox bottomContainer;
-    @FXML
-    private HBox playerHand;
-    @FXML
-    private VBox leftHand;
-    @FXML
-    private VBox rightHand;
-    @FXML
-    private HBox topHand;
-    @FXML
-    private ImageView pileImage;
-    @FXML
-    private ImageView backCardImage;
-    @FXML private ToggleButton unoTogglePlayer;
-    @FXML private ToggleButton unoToggleLeft;
-    @FXML private ToggleButton unoToggleTop;
-    @FXML private ToggleButton unoToggleRight;
-
-    @FXML
-    private ImageView directionImage;
-
-
-
-    // UNO indicators
-    @FXML
-    private ImageView unoBottomIndicator;
-    @FXML
-    private ImageView unoTopIndicator;
-    @FXML
-    private ImageView unoLeftIndicator;
-    @FXML
-    private ImageView unoRightIndicator;
-
+    private int gameColor = -1;
     private final List<ImageView> allHandCards = new ArrayList<>();
 
     private static final double CARD_WIDTH = 140;
@@ -69,72 +55,66 @@ public class GameController implements Initializable {
     private List<String> leftOpponentCards = List.of();
     private List<String> topOpponentCards = List.of();
     private List<String> rightOpponentCards = List.of();
+    private int Index=0;
+    @FXML private Circle dotTop;
+    @FXML private Circle dotRight;
+    @FXML private Circle dotBottom;
+    @FXML private Circle dotLeft;
+
+    @FXML private VBox gameOverOverlay;
+    @FXML private Text winnerText;
+    @FXML private Text scoreText;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        playerName= SessionManager.getInstance().getUsername();
+        System.out.println(playerName);
         topContainer.setMaxHeight(CARD_HEIGHT + 20);
         bottomContainer.setMaxHeight(CARD_HEIGHT + 20);
         backCardImage.setImage(new Image(getClass().getResourceAsStream("/images/uno_card-back.png")));
         backCardImage.setFitWidth(CARD_WIDTH);
         backCardImage.setFitHeight(CARD_HEIGHT);
         backCardImage.setStyle("-fx-cursor: hand;");
-        backCardImage.setOnMouseClicked(event -> System.out.println("Deck clicked!"));
+        backCardImage.setOnMouseClicked(event -> {
+            System.out.println("Deck clicked!");
+
+            // Create the JSON payload
+            JSONObject json = new JSONObject();
+            json.put("playerName",  playerName); // Replace with the actual player name
+            json.put("actionType", -5); // The index of the clicked card
+
+            // Send the POST request with the JSON payload
+            try {
+                String response = ApiClient.post("/game/match/makeMove", json.toString());
+                System.out.println("Response from backend: " + response);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            event.consume(); // Prevent further propagation
+        });
 
         Boolean isMultiplayer = false;
-        String playerName = "";
 
         JSONObject json = new JSONObject();
         json.put("playerName", playerName);
         json.put("isMultiplayer", isMultiplayer);
         try {
             String response = ApiClient.post("/game/create", String.valueOf(json));
-            System.out.println("Game Creation Successfull: " + response); // debug
+            System.out.println("Game Creation Successful: " + response);
         } catch (Exception e) {
-            System.out.println("Game Creation failed: " + e.getMessage()); // debug
+            System.out.println("Game Creation failed: " + e.getMessage());
         }
 
-        String response= null;
+        // Initial game state
         try {
-            response = ApiClient.get("/game/state");
+            String response = ApiClient.get("/game/state");
+            System.out.println("Initial game state: " + response);
+            updateGameState(new JSONObject(response));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("Game state: " + response);
-
-        JSONObject json2 = new JSONObject(response);
-
-        this.playerCards = jsonArrayToList(json2.getJSONArray("player0CardPaths"));
-        this.leftOpponentCards = jsonArrayToList(json2.getJSONArray("player3CardPaths"));
-        this.topOpponentCards = jsonArrayToList(json2.getJSONArray("player2CardPaths"));
-        this.rightOpponentCards = jsonArrayToList(json2.getJSONArray("player1CardPaths"));
-
-//        JSONObject json2 = new JSONObject(response);
-//
-//        // Access the first card object
-//        JSONObject firstCard = json2.getJSONArray("player0Cards").getJSONObject(0);
-//
-//        // Extract individual values
-//        boolean special = firstCard.getBoolean("special");
-//        String color = firstCard.getString("color");
-//        String value = firstCard.getString("value");
-//
-//        System.out.println("Special: " + special);
-//        System.out.println("Color: " + color);
-//        System.out.println("Value: " + value);
-
-        setDirection(true);
-
-        pileImage.setImage(new Image(getClass().getResourceAsStream("/images/uno_card-yellow2.png")));
-        pileImage.setFitWidth(CARD_WIDTH);
-        pileImage.setFitHeight(CARD_HEIGHT);
-
-
-
-        playerCards.forEach(path -> playerHand.getChildren().add(createCardImageView(path, 0)));
-        leftOpponentCards.forEach(path -> leftHand.getChildren().add(createCardImageView(path, 90)));
-        topOpponentCards.forEach(path -> topHand.getChildren().add(createCardImageView(path, 180)));
-        rightOpponentCards.forEach(path -> rightHand.getChildren().add(createCardImageView(path, -90)));
 
         ChangeListener<Number> resizeListener = (obs, oldVal, newVal) -> applySpacing();
         rootPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
@@ -145,20 +125,157 @@ public class GameController implements Initializable {
             }
         });
 
+        // Start polling game state in a background thread
+        Thread gameStatePollingThread = new Thread(() -> {
+
+                String lastResponse = null;
+                while (!gameEnded) {
+                    try {
+                        String newResponse = ApiClient.get("/game/state");
+                        System.out.println(newResponse);
+                        if (!newResponse.equals(lastResponse)) {
+                            lastResponse = newResponse;
+                            JSONObject jsonState = new JSONObject(newResponse);
+                            Platform.runLater(() -> {
+                                try {
+                                    updateGameState(jsonState);
+                                } catch (Exception e) {
+                                    System.out.println("Failed to update game state: " + e.getMessage());
+                                }
+                            });
+                        }
+                        Thread.sleep(1000); // 1 second polling interval
+                    } catch (IOException | InterruptedException e) {
+                        System.out.println("Polling error: " + e.getMessage());
+                        break;
+                    }
+                }
+            Platform.runLater(() -> {
+                winnerText.setText("Winner is: " + winner); // implement getWinnerName()
+                String newResponse = null;
+                try {
+                    newResponse = ApiClient.get("/game/getScore");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                int score = Integer.parseInt(newResponse.trim());
+                scoreText.setText("Score is: " + score);  // implement getWinnerScore()
+
+
+                gameOverOverlay.setVisible(true);
+
+                PauseTransition pause = new PauseTransition(Duration.seconds(4));
+                pause.setOnFinished(event -> SceneManager.switchTo("/lobby.fxml"));
+                pause.play();
+            });
+
+        });
+        gameStatePollingThread.setDaemon(true);
+        gameStatePollingThread.start();
     }
 
-    private ImageView createCardImageView(String path, double rotation) {
+    private void updateGameState(JSONObject json2) {
+        gameEnded = json2.getBoolean("gameEnded");
+        this.playerCards = jsonArrayToList(json2.getJSONArray("player0CardPaths"));
+        this.leftOpponentCards = jsonArrayToList(json2.getJSONArray("player3CardPaths"));
+        this.topOpponentCards = jsonArrayToList(json2.getJSONArray("player2CardPaths"));
+        this.rightOpponentCards = jsonArrayToList(json2.getJSONArray("player1CardPaths"));
+
+        setDirection(json2.getInt("direction") == 1);
+        gameColor= json2.getInt("gameColor");
+        winner= json2.getString("winner");
+        updateGameColorIndicator(gameColor);
+        System.out.println("Game Color " + gameColor);
+        pileImage.setImage(new Image(getClass().getResourceAsStream(json2.getString("pileTopImagePath"))));
+        pileImage.setFitWidth(CARD_WIDTH);
+        pileImage.setFitHeight(CARD_HEIGHT);
+
+        playerHand.getChildren().clear();
+        leftHand.getChildren().clear();
+        topHand.getChildren().clear();
+        rightHand.getChildren().clear();
+
+        for (int i = 0; i < playerCards.size(); i++) {
+            String path = playerCards.get(i);
+            ImageView cardView = createCardImageView(path, 0, true, i);  // Pass the index
+            playerHand.getChildren().add(cardView);
+        }
+
+        leftOpponentCards.forEach(path -> leftHand.getChildren().add(createCardImageView(path, 90, false, 0)));
+        topOpponentCards.forEach(path -> topHand.getChildren().add(createCardImageView(path, 180, false, 0 )));
+        rightOpponentCards.forEach(path -> rightHand.getChildren().add(createCardImageView(path, -90, false, 0)));
+        turn= json2.getInt("turn");
+        updateTurnIndicators(turn);
+        updateUnoIndicators(json2.getInt("size3"), json2.getInt("size2"), json2.getInt("size1"), json2.getInt("size4"));
+        applySpacing();
+    }
+
+    private ImageView createCardImageView(String path, double rotation, boolean isClickable, int index) {
         ImageView iv = new ImageView(new Image(getClass().getResourceAsStream(path)));
         iv.setFitWidth(CARD_WIDTH);
         iv.setFitHeight(CARD_HEIGHT);
         iv.setPreserveRatio(true);
         iv.setSmooth(true);
         iv.setRotate(rotation);
-        iv.setStyle("-fx-cursor: hand;");
-        iv.setOnMouseClicked(event -> System.out.println("Card clicked: " + path));
+        iv.setPickOnBounds(true);
+        iv.setMouseTransparent(false);
+        iv.toFront();
+        iv.setStyle(isClickable ? "-fx-cursor: hand;" : "-fx-cursor: default;");
+
+        iv.setOnMouseClicked(event -> {
+            System.out.println("Card clicked! Index: " + index + ", Path: " + path);
+
+            JSONObject json = new JSONObject();
+            json.put("playerName", playerName);
+            json.put("actionType", index);
+
+                if (path.endsWith("uno_card-wildchange.png")) {
+
+                    Index= index;
+                    colorPicker.setVisible(true);
+                    colorPicker.setManaged(true);
+                }
+                else if(path.endsWith("uno_card-wilddraw4.png")) {
+                    json.put("playerName", playerName);
+                    json.put("actionType", -11);
+                    String response = null;
+                    try {
+                        response = ApiClient.post("/game/match/isPlayable", json.toString());
+
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    if ("1".equals(response)) {
+                        Index= index;
+                        colorPicker.setVisible(true);
+                        colorPicker.setManaged(true);
+
+                    } else if ("0".equals(response)) {
+                        System.out.println("Move is NOT playable");
+                    }
+                }
+                else {
+                    new Thread(() -> {
+                        try {
+                            ApiClient.post("/game/match/makeMove", json.toString()); // no need to read response
+                        } catch (Exception e) {
+                            System.out.println("Error making move in normal: " + e.getMessage());
+                        }
+                    }).start();
+                }
+
+
+
+
+                // Check if the card is a wild card
+
+            event.consume(); // Prevent further propagation
+        });
+
         allHandCards.add(iv);
         return iv;
     }
+
 
     private void applySpacing() {
         adjustSpacingHBox(playerHand, playerCards.size());
@@ -187,48 +304,91 @@ public class GameController implements Initializable {
         box.setSpacing(spacing);
     }
 
-
-
-    private void setDirection(boolean clockwise) {
-        String imagePath = clockwise ? "/images/arrow_cw.png" : "/images/arrow_ccw.png";
+    private void setDirection(boolean counterclockwise) {
+        String imagePath = counterclockwise ? "/images/arrow_ccw.png" : "/images/arrow_cw.png";
         directionImage.setImage(new Image(getClass().getResourceAsStream(imagePath)));
         directionImage.setPreserveRatio(true);
         directionImage.setSmooth(true);
     }
 
-    @FXML
-    public void onSkipClicked() {
-        ;
+    @FXML public void onSkipClicked() {
+        System.out.println("Skip button clicked");
+        JSONObject playJson = new JSONObject();
+        playJson.put("playerName", playerName);
+        playJson.put("actionType", -6);
+
+        new Thread(() -> {
+            try {
+                ApiClient.post("/game/match/makeMove", playJson.toString());
+            } catch (IOException e) {
+                System.err.println("Error sending wild play:");
+                e.printStackTrace();
+            }
+        }).start();
     }
 
-    @FXML
-    public void onWildClicked() {
-        ;
+    @FXML public void onWildClicked() {
+        JSONObject playJson = new JSONObject();
+        playJson.put("playerName", playerName);
+        playJson.put("actionType", -9);
+
+        new Thread(() -> {
+            try {
+                ApiClient.post("/game/match/makeMove", playJson.toString());
+            } catch (IOException e) {
+                System.err.println("Error sending wild play:");
+                e.printStackTrace();
+            }
+        }).start();
+        System.out.println("Wild button clicked");
     }
 
-    @FXML
-    public void onReverseClicked() {
-        ;
+    @FXML public void onReverseClicked() {
+        JSONObject playJson = new JSONObject();
+        playJson.put("playerName", playerName);
+        playJson.put("actionType", -7);
+
+        new Thread(() -> {
+            try {
+                ApiClient.post("/game/match/makeMove", playJson.toString());
+            } catch (IOException e) {
+                System.err.println("Error sending wild play:");
+                e.printStackTrace();
+            }
+        }).start();
+        System.out.println("Reverse button clicked");
     }
 
-    @FXML
-    public void onDraw2Clicked() {
-        ;
+    @FXML public void onDraw2Clicked() {
+        JSONObject playJson = new JSONObject();
+        playJson.put("playerName", playerName);
+        playJson.put("actionType", -8);
+
+        new Thread(() -> {
+            try {
+                ApiClient.post("/game/match/makeMove", playJson.toString());
+            } catch (IOException e) {
+                System.err.println("Error sending wild play:");
+                e.printStackTrace();
+            }
+        }).start();
+        System.out.println("Draw 2 button clicked");
     }
 
-    @FXML
-    public void onWildDraw4Clicked() {
-        ;
-    }
+    @FXML public void onWildDraw4Clicked() {
+        JSONObject playJson = new JSONObject();
+        playJson.put("playerName", playerName);
+        playJson.put("actionType", -10);
 
-
-    @FXML
-    public void onUnoTogglePlayer() {
-        boolean declaredUno = unoTogglePlayer.isSelected();
-        unoTogglePlayer.setStyle(declaredUno
-                ? "-fx-background-color: green; -fx-text-fill: white; -fx-font-weight: bold;"
-                : "-fx-background-color: red; -fx-text-fill: white; -fx-font-weight: bold;");
-        System.out.println(declaredUno ? "You declared UNO!" : "You revoked UNO!");
+        new Thread(() -> {
+            try {
+                ApiClient.post("/game/match/makeMove", playJson.toString());
+            } catch (IOException e) {
+                System.err.println("Error sending wild play:");
+                e.printStackTrace();
+            }
+        }).start();
+        System.out.println("Wild Draw 4 button clicked");
     }
 
     private List<String> jsonArrayToList(JSONArray array) {
@@ -237,6 +397,98 @@ public class GameController implements Initializable {
             list.add(array.getString(i));
         }
         return list;
+    }
+    private void updateGameColorIndicator(int color) {
+        String fxColor;
+        switch (color) {
+            case 0 -> fxColor = "red";
+            case 1 -> fxColor = "yellow";
+            case 2 -> fxColor = "green";
+            case 3 -> fxColor = "blue";
+            default -> fxColor = "gray";
+        }
+        gameColorIndicator.setStyle("-fx-background-color: " + fxColor + "; -fx-border-color: black; -fx-border-radius: 5; -fx-background-radius: 5;");
+    }
+
+    @FXML private void onColorRed() throws IOException, InterruptedException {
+        sendColorChoice(0);  // Red
+    }
+    @FXML private void onColorYellow() throws IOException, InterruptedException {
+        sendColorChoice(1);  // Yellow
+    }
+    @FXML private void onColorGreen() throws IOException, InterruptedException {
+        sendColorChoice(2);  // Green
+    }
+    @FXML private void onColorBlue() throws IOException, InterruptedException {
+        sendColorChoice(3);  // Blue
+    }
+
+    private void sendColorChoice(int color) {
+        // 1) Send the wild card play
+        JSONObject playJson = new JSONObject();
+        playJson.put("playerName", playerName);
+        playJson.put("actionType", Index);
+
+
+            try {
+                ApiClient.post("/game/match/makeMove", playJson.toString());
+            } catch (IOException e) {
+                System.err.println("Error sending wild play:");
+                e.printStackTrace();
+            }
+
+        // 2) Send the chosen color
+        JSONObject colorJson = new JSONObject();
+        colorJson.put("playerName", playerName);
+        colorJson.put("actionType", color - 4);  // adjust if needed
+
+        new Thread(() -> {
+            try {
+                ApiClient.post("/game/match/makeMove", colorJson.toString());
+            } catch (IOException e) {
+                System.err.println("Error sending color choice:");
+                e.printStackTrace();
+            }
+        }).start();
+
+        // hide the color picker immediately
+        colorPicker.setVisible(false);
+        colorPicker.setManaged(false);
+    }
+
+    private void updateTurnIndicators(int turn) {
+        // Reset all dots to hidden
+        dotTop.setOpacity(0);
+        dotRight.setOpacity(0);
+        dotLeft.setOpacity(0);
+        dotBottom.setOpacity(0);
+
+        // Set the current turn's dot to be visible
+        switch (turn) {
+            case 0:
+                dotBottom.setOpacity(1);
+                break;
+            case 1:
+                dotRight.setOpacity(1);
+                break;
+            case 2:
+                dotTop.setOpacity(1);
+                break;
+            case 3:
+                dotLeft.setOpacity(1);
+                break;
+        }
+    }
+
+
+    public void updateUnoIndicators(int bottomCount, int leftCount, int topCount, int rightCount) {
+        unoIndicatorTop.setVisible(topCount == 1);
+
+        unoIndicatorRight.setVisible(rightCount == 1);
+
+        unoIndicatorBottom.setVisible(bottomCount == 1);
+
+        unoIndicatorLeft.setVisible(leftCount == 1);
     }
 
 }
