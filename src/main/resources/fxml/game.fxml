@@ -15,7 +15,7 @@
 <BorderPane fx:id="rootPane"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.demo.client.GameController"
-            style="-fx-background-color: #0236f5;"
+            style="-fx-background-color: #0df5da;"
             prefWidth="900" prefHeight="700">
 
     <!-- Top: Top opponent hand and title -->
@@ -74,25 +74,25 @@
 
             <!-- Dots for player positions -->
             <Circle fx:id="dotTop"
-                    radius="8"
-                    style="-fx-fill: black;"
+                    radius="15"
+                    style="-fx-fill: red;"
                     StackPane.alignment="TOP_CENTER"
                     translateY="10"/>
             <Circle fx:id="dotRight"
-                    radius="8"
-                    style="-fx-fill: black;"
+                    radius="15"
+                    style="-fx-fill: red;"
                     StackPane.alignment="CENTER_RIGHT"
-                    translateX="-10"/>
+                    translateX="-15"/>
             <Circle fx:id="dotBottom"
-                    radius="8"
-                    style="-fx-fill: black;"
+                    radius="15"
+                    style="-fx-fill: red;"
                     StackPane.alignment="BOTTOM_CENTER"
                     translateY="-10"/>
             <Circle fx:id="dotLeft"
-                    radius="8"
-                    style="-fx-fill: black;"
+                    radius="15"
+                    style="-fx-fill: red;"
                     StackPane.alignment="CENTER_LEFT"
-                    translateX="10"/>
+                    translateX="15"/>
 
             <!-- UNO indicators -->
             <StackPane fx:id="unoIndicatorTop"

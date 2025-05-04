@@ -314,25 +314,36 @@ public class GameController implements Initializable {
         sendColorChoice(3);  // Blue
     }
 
-    private void sendColorChoice(int color) throws IOException, InterruptedException {
-        System.out.println("girdi bura" );
-        JSONObject json = new JSONObject();
-        json.put("playerName", playerName);
-        json.put("actionType", Index);
+    private void sendColorChoice(int color) {
+        // 1) Send the wild card play
+        JSONObject playJson = new JSONObject();
+        playJson.put("playerName", playerName);
+        playJson.put("actionType", Index);
 
-        String response = ApiClient.post("/game/match/makeMove", json.toString());
-        System.out.println("Response from backend: " + response);
+        new Thread(() -> {
+            try {
+                ApiClient.post("/game/match/makeMove", playJson.toString());
+            } catch (IOException e) {
+                System.err.println("Error sending wild play:");
+                e.printStackTrace();
+            }
+        }).start();
+
+        // 2) Send the chosen color
         JSONObject colorJson = new JSONObject();
         colorJson.put("playerName", playerName);
-        colorJson.put("actionType", color - 4);  // Adjust as your backend expects
+        colorJson.put("actionType", color - 4);  // adjust if needed
 
-        try {
-            String colorResponse = ApiClient.post("/game/match/makeMove", colorJson.toString());
-            System.out.println("Color chosen response: " + colorResponse);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        new Thread(() -> {
+            try {
+                ApiClient.post("/game/match/makeMove", colorJson.toString());
+            } catch (IOException e) {
+                System.err.println("Error sending color choice:");
+                e.printStackTrace();
+            }
+        }).start();
 
+        // hide the color picker immediately
         colorPicker.setVisible(false);
         colorPicker.setManaged(false);
     }
