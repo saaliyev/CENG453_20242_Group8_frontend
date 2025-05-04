@@ -10,7 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class ApiClient {
-    private static final String BASE_URL = "http://localhost:8080"; // Change this for deployment
+    private static final String BASE_URL = "https://ceng453-20242-group8-backend.onrender.com"; // Change this for deployment
 
     public static String post(String endpoint, String jsonInputString) throws IOException {
         URL url = new URL(BASE_URL + endpoint);

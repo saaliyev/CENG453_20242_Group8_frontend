@@ -106,7 +106,7 @@
             <!-- UNO indicators -->
             <StackPane fx:id="unoIndicatorTop"
                        visible="false"
-                       managed="true"
+                       managed="false"
                        mouseTransparent="true"
                        pickOnBounds="false"
                        StackPane.alignment="TOP_CENTER"
@@ -120,7 +120,7 @@
             </StackPane>
 
             <StackPane fx:id="unoIndicatorRight"
-                       visible="false" managed="true"
+                       visible="false" managed="false"
                        mouseTransparent="true"
                        StackPane.alignment="CENTER_RIGHT"
                        translateX="205">
@@ -133,7 +133,7 @@
             </StackPane>
 
             <StackPane fx:id="unoIndicatorBottom"
-                       visible="false" managed="true"
+                       visible="false" managed="false"
                        mouseTransparent="true"
                        StackPane.alignment="BOTTOM_CENTER"
                        translateY="-250">
@@ -146,7 +146,7 @@
             </StackPane>
 
             <StackPane fx:id="unoIndicatorLeft"
-                       visible="false" managed="true"
+                       visible="false" managed="false"
                        mouseTransparent="true"
                        StackPane.alignment="CENTER_LEFT"
                        translateX="250">
