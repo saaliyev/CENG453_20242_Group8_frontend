@@ -7,10 +7,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -31,15 +29,15 @@ public class GameController implements Initializable {
     @FXML private HBox topHand;
     @FXML private ImageView pileImage;
     @FXML private ImageView backCardImage;
-    @FXML private ToggleButton unoTogglePlayer;
-    @FXML private ToggleButton unoToggleLeft;
-    @FXML private ToggleButton unoToggleTop;
-    @FXML private ToggleButton unoToggleRight;
+    @FXML private StackPane unoIndicatorTop;
+    @FXML private StackPane unoIndicatorRight;
+    @FXML private StackPane unoIndicatorBottom;
+    @FXML private StackPane unoIndicatorLeft;
     @FXML private ImageView directionImage;
     @FXML private Region gameColorIndicator;
     @FXML private VBox colorPicker;
     private boolean gameEnded= false;
-
+    private int turn=0;
 
     private int gameColor = -1;
     private final List<ImageView> allHandCards = new ArrayList<>();
@@ -53,6 +51,12 @@ public class GameController implements Initializable {
     private List<String> topOpponentCards = List.of();
     private List<String> rightOpponentCards = List.of();
     private int Index=0;
+    @FXML private Circle dotTop;
+    @FXML private Circle dotRight;
+    @FXML private Circle dotBottom;
+    @FXML private Circle dotLeft;
+
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -136,6 +140,7 @@ public class GameController implements Initializable {
                         break;
                     }
                 }
+                SceneManager.switchTo("/lobby.fxml");
         });
         gameStatePollingThread.setDaemon(true);
         gameStatePollingThread.start();
@@ -170,7 +175,9 @@ public class GameController implements Initializable {
         leftOpponentCards.forEach(path -> leftHand.getChildren().add(createCardImageView(path, 90, false, 0)));
         topOpponentCards.forEach(path -> topHand.getChildren().add(createCardImageView(path, 180, false, 0 )));
         rightOpponentCards.forEach(path -> rightHand.getChildren().add(createCardImageView(path, -90, false, 0)));
-
+        turn= json2.getInt("turn");
+        updateTurnIndicators(turn);
+        updateUnoIndicators(json2.getInt("size3"), json2.getInt("size2"), json2.getInt("size1"), json2.getInt("size4"));
         applySpacing();
     }
 
@@ -203,7 +210,7 @@ public class GameController implements Initializable {
                         try {
                             ApiClient.post("/game/match/makeMove", json.toString()); // no need to read response
                         } catch (Exception e) {
-                            System.out.println("Error making move: " + e.getMessage());
+                            System.out.println("Error making move in normal: " + e.getMessage());
                         }
                     }).start();
                 }
@@ -294,20 +301,20 @@ public class GameController implements Initializable {
         gameColorIndicator.setStyle("-fx-background-color: " + fxColor + "; -fx-border-color: black; -fx-border-radius: 5; -fx-background-radius: 5;");
     }
 
-    @FXML private void onColorRed() throws IOException {
+    @FXML private void onColorRed() throws IOException, InterruptedException {
         sendColorChoice(0);  // Red
     }
-    @FXML private void onColorYellow() throws IOException {
+    @FXML private void onColorYellow() throws IOException, InterruptedException {
         sendColorChoice(1);  // Yellow
     }
-    @FXML private void onColorGreen() throws IOException {
+    @FXML private void onColorGreen() throws IOException, InterruptedException {
         sendColorChoice(2);  // Green
     }
-    @FXML private void onColorBlue() throws IOException {
+    @FXML private void onColorBlue() throws IOException, InterruptedException {
         sendColorChoice(3);  // Blue
     }
 
-    private void sendColorChoice(int color) throws IOException {
+    private void sendColorChoice(int color) throws IOException, InterruptedException {
         System.out.println("girdi bura" );
         JSONObject json = new JSONObject();
         json.put("playerName", playerName);
@@ -330,5 +337,43 @@ public class GameController implements Initializable {
         colorPicker.setManaged(false);
     }
 
+    private void updateTurnIndicators(int turn) {
+        // Reset all dots to hidden
+        dotTop.setOpacity(0);
+        dotRight.setOpacity(0);
+        dotLeft.setOpacity(0);
+        dotBottom.setOpacity(0);
+
+        // Set the current turn's dot to be visible
+        switch (turn) {
+            case 0:
+                dotBottom.setOpacity(1);
+                break;
+            case 1:
+                dotRight.setOpacity(1);
+                break;
+            case 2:
+                dotTop.setOpacity(1);
+                break;
+            case 3:
+                dotLeft.setOpacity(1);
+                break;
+        }
+    }
+
+
+    public void updateUnoIndicators(int bottomCount, int leftCount, int topCount, int rightCount) {
+        unoIndicatorTop.setVisible(topCount == 1);
+        unoIndicatorTop.setManaged(topCount == 1);
+
+        unoIndicatorRight.setVisible(rightCount == 1);
+        unoIndicatorRight.setManaged(rightCount == 1);
+
+        unoIndicatorBottom.setVisible(bottomCount == 1);
+        unoIndicatorBottom.setManaged(bottomCount == 1);
+
+        unoIndicatorLeft.setVisible(leftCount == 1);
+        unoIndicatorLeft.setManaged(leftCount == 1);
+    }
 
 }

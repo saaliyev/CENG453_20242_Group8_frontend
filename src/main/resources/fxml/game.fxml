@@ -11,6 +11,7 @@
 <?import javafx.scene.text.Text?>
 
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.shape.Circle?>
 <BorderPane fx:id="rootPane"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.demo.client.GameController"
@@ -24,7 +25,7 @@
             <HBox fx:id="topHand" alignment="CENTER" spacing="10" />
 <!--            <ToggleButton fx:id="unoToggleTop" text="Top: UNO!" disable="true"-->
 <!--                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />-->
-            <Text text="UNO Game" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+            <Text text="" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
         </VBox>
     </top>
 
@@ -43,27 +44,98 @@
         </VBox>
     </bottom>
 
-    <!-- Center: Draw pile, play pile, and direction image -->
     <center>
-        <VBox alignment="CENTER" spacing="10">
-            <VBox fx:id="colorPicker" alignment="CENTER" spacing="10" visible="false" managed="false">
-                <Button text="Red"    style="-fx-background-color: red;    -fx-text-fill: white;" onAction="#onColorRed"/>
-                <Button text="Yellow" style="-fx-background-color: yellow; -fx-text-fill: black;" onAction="#onColorYellow"/>
-                <Button text="Green"  style="-fx-background-color: green;  -fx-text-fill: white;" onAction="#onColorGreen"/>
-                <Button text="Blue"   style="-fx-background-color: blue;   -fx-text-fill: white;" onAction="#onColorBlue"/>
+        <StackPane fx:id="centerStack" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" alignment="CENTER">
+
+            <!-- Game UI -->
+            <VBox alignment="CENTER" spacing="10">
+                <VBox fx:id="colorPicker" alignment="CENTER" spacing="10" visible="false" managed="false">
+                    <Button text="Red"    style="-fx-background-color: red;    -fx-text-fill: white;" onAction="#onColorRed"/>
+                    <Button text="Yellow" style="-fx-background-color: yellow; -fx-text-fill: black;" onAction="#onColorYellow"/>
+                    <Button text="Green"  style="-fx-background-color: green;  -fx-text-fill: white;" onAction="#onColorGreen"/>
+                    <Button text="Blue"   style="-fx-background-color: blue;   -fx-text-fill: white;" onAction="#onColorBlue"/>
+                </VBox>
+                <ImageView fx:id="directionImage"
+                           fitWidth="60" fitHeight="60"
+                           style="-fx-effect: dropshadow(gaussian, black, 4, 0.5, 0, 0);" />
+                <HBox alignment="CENTER" spacing="20">
+                    <ImageView fx:id="backCardImage" />
+                    <StackPane alignment="CENTER">
+                        <ImageView fx:id="pileImage" />
+                    </StackPane>
+                    <Region fx:id="gameColorIndicator"
+                            prefWidth="30" prefHeight="30"
+                            style="-fx-background-color: gray;
+                           -fx-border-color: black;
+                           -fx-border-radius: 5;
+                           -fx-background-radius: 5;" />
+                </HBox>
             </VBox>
-            <ImageView fx:id="directionImage"
-                       fitWidth="60" fitHeight="60"
-                       style="-fx-effect: dropshadow(gaussian, black, 4, 0.5, 0, 0);" />
-            <HBox alignment="CENTER" spacing="20">
-                <ImageView fx:id="backCardImage" />
-                <StackPane alignment="CENTER">
-                    <ImageView fx:id="pileImage" />
-                </StackPane>
-                <Region fx:id="gameColorIndicator" prefWidth="30" prefHeight="30" style="-fx-background-color: gray; -fx-border-color: black; -fx-border-radius: 5; -fx-background-radius: 5;" />
-            </HBox>
-        </VBox>
+
+            <!-- Dots for player positions -->
+            <Circle fx:id="dotTop"
+                    radius="8"
+                    style="-fx-fill: black;"
+                    StackPane.alignment="TOP_CENTER"
+                    translateY="10"/>
+            <Circle fx:id="dotRight"
+                    radius="8"
+                    style="-fx-fill: black;"
+                    StackPane.alignment="CENTER_RIGHT"
+                    translateX="-10"/>
+            <Circle fx:id="dotBottom"
+                    radius="8"
+                    style="-fx-fill: black;"
+                    StackPane.alignment="BOTTOM_CENTER"
+                    translateY="-10"/>
+            <Circle fx:id="dotLeft"
+                    radius="8"
+                    style="-fx-fill: black;"
+                    StackPane.alignment="CENTER_LEFT"
+                    translateX="10"/>
+
+            <!-- UNO indicators -->
+            <StackPane fx:id="unoIndicatorTop"
+                       visible="false" managed="false"
+                       mouseTransparent="true"
+                       StackPane.alignment="TOP_CENTER"
+                       translateY="250">
+                <Circle radius="20" style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;" />
+                <Text text="UNO" style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" />
+            </StackPane>
+
+            <StackPane fx:id="unoIndicatorRight"
+                       visible="false" managed="false"
+                       mouseTransparent="true"
+                       StackPane.alignment="CENTER_RIGHT"
+                       translateX="-205">
+                <Circle radius="20" style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;" />
+                <Text text="UNO" style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" />
+            </StackPane>
+
+            <StackPane fx:id="unoIndicatorBottom"
+                       visible="false" managed="false"
+                       mouseTransparent="true"
+                       StackPane.alignment="BOTTOM_CENTER"
+                       translateY="-250">
+                <Circle radius="20" style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;" />
+                <Text text="UNO" style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" />
+            </StackPane>
+
+            <StackPane fx:id="unoIndicatorLeft"
+                       visible="false" managed="false"
+                       mouseTransparent="true"
+                       StackPane.alignment="CENTER_LEFT"
+                       translateX="250">
+                <Circle radius="20" style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;" />
+                <Text text="UNO" style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" />
+            </StackPane>
+
+
+        </StackPane>
+
     </center>
+
 
     <!-- Left: Left opponent hand and player action buttons -->
     <left>

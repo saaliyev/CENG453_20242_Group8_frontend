@@ -9,7 +9,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         SceneManager.setStage(primaryStage);
-        SceneManager.switchTo("mode_selection.fxml");
+        SceneManager.switchTo("login.fxml");
     }
 
     public static void main(String[] args) {
