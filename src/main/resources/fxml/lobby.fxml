@@ -7,6 +7,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
+<?import javafx.scene.layout.HBox?>
 <VBox xmlns="http://javafx.com/javafx/8"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.demo.client.LobbyController"
@@ -14,12 +15,15 @@
       spacing="20">
 
     <padding>
-        <Insets top="50" bottom="50" left="50" right="50"/>
+        <Insets top="20" bottom="20" left="20" right="20"/>
     </padding>
 
-    <Button text="Play"   onAction="#onPlayClicked" style="-fx-font-size: 18px;"/>
-    <Button text="Logout" onAction="#onLogout" />
-    <Text fx:id="messageText" />
+    <!-- Period selection buttons -->
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Weekly" onAction="#onWeeklyClicked"/>
+        <Button text="Monthly" onAction="#onMonthlyClicked"/>
+        <Button text="All Time" onAction="#onAllTimeClicked"/>
+    </HBox>
 
     <ListView fx:id="leaderboardListView"
               prefWidth="300"
@@ -28,4 +32,11 @@
             <Label text="No entries yet…" />
         </placeholder>
     </ListView>
+
+    <Text fx:id="messageText" />
+
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Play"   onAction="#onPlayClicked" style="-fx-font-size: 14px;"/>
+        <Button text="Logout" onAction="#onLogout"    style="-fx-font-size: 14px;"/>
+    </HBox>
 </VBox>
