@@ -1,5 +1,6 @@
 package com.example.demo.client;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
@@ -9,6 +10,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
+import javafx.util.Duration;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -19,7 +22,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class GameController implements Initializable {
-    String playerName = "YourPlayerName4";
+    String playerName = "";
     @FXML private BorderPane rootPane;
     @FXML private VBox topContainer;
     @FXML private HBox bottomContainer;
@@ -38,6 +41,8 @@ public class GameController implements Initializable {
     @FXML private VBox colorPicker;
     private boolean gameEnded= false;
     private int turn=0;
+    private String winner= "";
+    private int score=0;
 
     private int gameColor = -1;
     private final List<ImageView> allHandCards = new ArrayList<>();
@@ -56,10 +61,15 @@ public class GameController implements Initializable {
     @FXML private Circle dotBottom;
     @FXML private Circle dotLeft;
 
+    @FXML private VBox gameOverOverlay;
+    @FXML private Text winnerText;
+    @FXML private Text scoreText;
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        playerName= SessionManager.getInstance().getUsername();
+        System.out.println(playerName);
         topContainer.setMaxHeight(CARD_HEIGHT + 20);
         bottomContainer.setMaxHeight(CARD_HEIGHT + 20);
         backCardImage.setImage(new Image(getClass().getResourceAsStream("/images/uno_card-back.png")));
@@ -140,7 +150,24 @@ public class GameController implements Initializable {
                         break;
                     }
                 }
-                Platform.runLater(() -> SceneManager.switchTo("/lobby.fxml"));
+            Platform.runLater(() -> {
+                winnerText.setText("Winner is: " + winner); // implement getWinnerName()
+                String newResponse = null;
+                try {
+                    newResponse = ApiClient.get("/game/getScore");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                int score = Integer.parseInt(newResponse.trim());
+                scoreText.setText("Score is: " + score);  // implement getWinnerScore()
+
+
+                gameOverOverlay.setVisible(true);
+
+                PauseTransition pause = new PauseTransition(Duration.seconds(4));
+                pause.setOnFinished(event -> SceneManager.switchTo("/lobby.fxml"));
+                pause.play();
+            });
 
         });
         gameStatePollingThread.setDaemon(true);
@@ -156,6 +183,7 @@ public class GameController implements Initializable {
 
         setDirection(json2.getInt("direction") == 1);
         gameColor= json2.getInt("gameColor");
+        winner= json2.getString("winner");
         updateGameColorIndicator(gameColor);
         System.out.println("Game Color " + gameColor);
         pileImage.setImage(new Image(getClass().getResourceAsStream(json2.getString("pileTopImagePath"))));

@@ -205,4 +205,13 @@
     <Button text="Draw two" onAction="#onDraw2Clicked" />
     <Button text="Wild" onAction="#onWildClicked" />
     <Button text="Wild Draw four" onAction="#onWildDraw4Clicked" />
+    <VBox fx:id="gameOverOverlay"
+          alignment="CENTER"
+          visible="false"
+          style="-fx-background-color: rgba(0, 0, 0, 0.7);"
+          spacing="20"
+          prefWidth="800" prefHeight="600">
+        <Text fx:id="winnerText" style="-fx-fill: white; -fx-font-size: 24px;"/>
+        <Text fx:id="scoreText"  style="-fx-fill: white; -fx-font-size: 18px;"/>
+    </VBox>
 </BorderPane>
