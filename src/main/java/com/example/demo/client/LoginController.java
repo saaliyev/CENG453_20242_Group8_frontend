@@ -1,13 +1,10 @@
 package com.example.demo.client;
 
+import com.example.demo.client.SessionManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.fxml.FXMLLoader;
-import java.io.IOException;
 import org.json.JSONObject;
 
 public class LoginController {
@@ -23,22 +20,29 @@ public class LoginController {
         JSONObject json = new JSONObject();
         json.put("username", username);
         json.put("password", password);
+
         try {
             String response = ApiClient.post("/auth/login", json.toString());
-            System.out.println("Login response: " + response); // debug
+            JSONObject obj = new JSONObject(response);
+            String token = obj.getString("token");
+            String user = obj.getString("username");
+
+            // Save session token globally
+            SessionManager.getInstance().saveSession(user, token);
+
+            System.out.println("Login successful. Token: " + token);
             messageText.setText("Login successful!");
+
             SceneManager.switchTo("/lobby.fxml");
-//            SceneManager.switchTo("mode_selection.fxml");
+
         } catch (Exception e) {
-            System.out.println("Login failed: " + e.getMessage()); // debug
+            System.out.println("Login failed: " + e.getMessage());
             messageText.setText("Login failed: " + e.getMessage());
         }
     }
-
 
     @FXML
     private void goToRegister() {
         SceneManager.switchTo("register.fxml");
     }
-
 }

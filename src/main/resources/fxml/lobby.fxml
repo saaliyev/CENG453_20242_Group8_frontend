@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.text.Text?>
 <VBox xmlns="http://javafx.com/javafx/8"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.demo.client.LobbyController"
@@ -15,5 +16,9 @@
     </padding>
 
     <Button text="Play" onAction="#onPlayClicked" style="-fx-font-size: 18px;"/>
+    <Button text="Logout" onAction="#onLogout" />
+    <Text fx:id="messageText" />
+
+
 
 </VBox>
