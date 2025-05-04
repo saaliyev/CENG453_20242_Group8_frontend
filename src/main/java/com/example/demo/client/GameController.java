@@ -200,10 +200,30 @@ public class GameController implements Initializable {
             json.put("playerName", playerName);
             json.put("actionType", index);
 
-                if (path.endsWith("uno_card-wildchange.png") || path.endsWith("uno_card-wilddraw4.png")) {
+                if (path.endsWith("uno_card-wildchange.png")) {
+
                     Index= index;
                     colorPicker.setVisible(true);
                     colorPicker.setManaged(true);
+                }
+                else if(path.endsWith("uno_card-wilddraw4.png")) {
+                    json.put("playerName", playerName);
+                    json.put("actionType", -11);
+                    String response = null;
+                    try {
+                        response = ApiClient.post("/game/match/isPlayable", json.toString());
+
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    if ("1".equals(response)) {
+                        Index= index;
+                        colorPicker.setVisible(true);
+                        colorPicker.setManaged(true);
+
+                    } else if ("0".equals(response)) {
+                        System.out.println("Move is NOT playable");
+                    }
                 }
                 else {
                     new Thread(() -> {
@@ -264,21 +284,81 @@ public class GameController implements Initializable {
 
     @FXML public void onSkipClicked() {
         System.out.println("Skip button clicked");
+        JSONObject playJson = new JSONObject();
+        playJson.put("playerName", playerName);
+        playJson.put("actionType", -6);
+
+        new Thread(() -> {
+            try {
+                ApiClient.post("/game/match/makeMove", playJson.toString());
+            } catch (IOException e) {
+                System.err.println("Error sending wild play:");
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     @FXML public void onWildClicked() {
+        JSONObject playJson = new JSONObject();
+        playJson.put("playerName", playerName);
+        playJson.put("actionType", -9);
+
+        new Thread(() -> {
+            try {
+                ApiClient.post("/game/match/makeMove", playJson.toString());
+            } catch (IOException e) {
+                System.err.println("Error sending wild play:");
+                e.printStackTrace();
+            }
+        }).start();
         System.out.println("Wild button clicked");
     }
 
     @FXML public void onReverseClicked() {
+        JSONObject playJson = new JSONObject();
+        playJson.put("playerName", playerName);
+        playJson.put("actionType", -7);
+
+        new Thread(() -> {
+            try {
+                ApiClient.post("/game/match/makeMove", playJson.toString());
+            } catch (IOException e) {
+                System.err.println("Error sending wild play:");
+                e.printStackTrace();
+            }
+        }).start();
         System.out.println("Reverse button clicked");
     }
 
     @FXML public void onDraw2Clicked() {
+        JSONObject playJson = new JSONObject();
+        playJson.put("playerName", playerName);
+        playJson.put("actionType", -8);
+
+        new Thread(() -> {
+            try {
+                ApiClient.post("/game/match/makeMove", playJson.toString());
+            } catch (IOException e) {
+                System.err.println("Error sending wild play:");
+                e.printStackTrace();
+            }
+        }).start();
         System.out.println("Draw 2 button clicked");
     }
 
     @FXML public void onWildDraw4Clicked() {
+        JSONObject playJson = new JSONObject();
+        playJson.put("playerName", playerName);
+        playJson.put("actionType", -10);
+
+        new Thread(() -> {
+            try {
+                ApiClient.post("/game/match/makeMove", playJson.toString());
+            } catch (IOException e) {
+                System.err.println("Error sending wild play:");
+                e.printStackTrace();
+            }
+        }).start();
         System.out.println("Wild Draw 4 button clicked");
     }
 
@@ -320,14 +400,13 @@ public class GameController implements Initializable {
         playJson.put("playerName", playerName);
         playJson.put("actionType", Index);
 
-        new Thread(() -> {
+
             try {
                 ApiClient.post("/game/match/makeMove", playJson.toString());
             } catch (IOException e) {
                 System.err.println("Error sending wild play:");
                 e.printStackTrace();
             }
-        }).start();
 
         // 2) Send the chosen color
         JSONObject colorJson = new JSONObject();
@@ -375,16 +454,12 @@ public class GameController implements Initializable {
 
     public void updateUnoIndicators(int bottomCount, int leftCount, int topCount, int rightCount) {
         unoIndicatorTop.setVisible(topCount == 1);
-        unoIndicatorTop.setManaged(topCount == 1);
 
         unoIndicatorRight.setVisible(rightCount == 1);
-        unoIndicatorRight.setManaged(rightCount == 1);
 
         unoIndicatorBottom.setVisible(bottomCount == 1);
-        unoIndicatorBottom.setManaged(bottomCount == 1);
 
         unoIndicatorLeft.setVisible(leftCount == 1);
-        unoIndicatorLeft.setManaged(leftCount == 1);
     }
 
 }

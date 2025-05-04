@@ -55,6 +55,15 @@
                     <Button text="Green"  style="-fx-background-color: green;  -fx-text-fill: white;" onAction="#onColorGreen"/>
                     <Button text="Blue"   style="-fx-background-color: blue;   -fx-text-fill: white;" onAction="#onColorBlue"/>
                 </VBox>
+                <VBox fx:id="debugActionButtons" alignment="CENTER" spacing="10" translateY="-50" translateX="300">
+                    <Button text="Trigger Skip"           style="-fx-background-color: #1abc9c; -fx-text-fill: white;" onAction="#onSkipClicked"/>
+                    <Button text="Trigger Wild"           style="-fx-background-color: #9b59b6; -fx-text-fill: white;" onAction="#onWildClicked"/>
+                    <Button text="Trigger Reverse"        style="-fx-background-color: #e67e22; -fx-text-fill: white;" onAction="#onReverseClicked"/>
+                    <Button text="Trigger Draw 2"         style="-fx-background-color: #f1c40f; -fx-text-fill: black;" onAction="#onDraw2Clicked"/>
+                    <Button text="Trigger Wild Draw 4"    style="-fx-background-color: #e74c3c; -fx-text-fill: white;" onAction="#onWildDraw4Clicked"/>
+                </VBox>
+
+
                 <ImageView fx:id="directionImage"
                            fitWidth="60" fitHeight="60"
                            style="-fx-effect: dropshadow(gaussian, black, 4, 0.5, 0, 0);" />
@@ -100,17 +109,25 @@
                        mouseTransparent="true"
                        StackPane.alignment="TOP_CENTER"
                        translateY="250">
-                <Circle radius="20" style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;" />
-                <Text text="UNO" style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" />
+                <Circle radius="20"
+                        style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;"
+                        mouseTransparent="true"/>
+                <Text text="UNO"
+                      style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"
+                      mouseTransparent="true"/>
             </StackPane>
 
             <StackPane fx:id="unoIndicatorRight"
                        visible="false" managed="false"
                        mouseTransparent="true"
                        StackPane.alignment="CENTER_RIGHT"
-                       translateX="-205">
-                <Circle radius="20" style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;" />
-                <Text text="UNO" style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" />
+                       translateX="205">
+                <Circle radius="20"
+                        style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;"
+                        mouseTransparent="true"/>
+                <Text text="UNO"
+                      style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"
+                      mouseTransparent="true"/>
             </StackPane>
 
             <StackPane fx:id="unoIndicatorBottom"
@@ -118,8 +135,12 @@
                        mouseTransparent="true"
                        StackPane.alignment="BOTTOM_CENTER"
                        translateY="-250">
-                <Circle radius="20" style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;" />
-                <Text text="UNO" style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" />
+                <Circle radius="20"
+                        style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;"
+                        mouseTransparent="true"/>
+                <Text text="UNO"
+                      style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"
+                      mouseTransparent="true"/>
             </StackPane>
 
             <StackPane fx:id="unoIndicatorLeft"
@@ -127,9 +148,14 @@
                        mouseTransparent="true"
                        StackPane.alignment="CENTER_LEFT"
                        translateX="250">
-                <Circle radius="20" style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;" />
-                <Text text="UNO" style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" />
+                <Circle radius="20"
+                        style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;"
+                        mouseTransparent="true"/>
+                <Text text="UNO"
+                      style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"
+                      mouseTransparent="true"/>
             </StackPane>
+
 
 
         </StackPane>

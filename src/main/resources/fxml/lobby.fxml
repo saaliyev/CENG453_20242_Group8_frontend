@@ -2,9 +2,11 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.VBox?>
-
 <?import javafx.scene.text.Text?>
+
 <VBox xmlns="http://javafx.com/javafx/8"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.demo.client.LobbyController"
@@ -15,10 +17,15 @@
         <Insets top="50" bottom="50" left="50" right="50"/>
     </padding>
 
-    <Button text="Play" onAction="#onPlayClicked" style="-fx-font-size: 18px;"/>
+    <Button text="Play"   onAction="#onPlayClicked" style="-fx-font-size: 18px;"/>
     <Button text="Logout" onAction="#onLogout" />
     <Text fx:id="messageText" />
 
-
-
+    <ListView fx:id="leaderboardListView"
+              prefWidth="300"
+              prefHeight="200">
+        <placeholder>
+            <Label text="No entries yet…" />
+        </placeholder>
+    </ListView>
 </VBox>
