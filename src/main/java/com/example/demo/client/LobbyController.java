@@ -10,6 +10,7 @@ import javafx.scene.text.Text;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -26,8 +27,15 @@ public class LobbyController implements Initializable {
         SceneManager.switchTo("mode_selection.fxml");
     }
 
-    @FXML private void onLogout() {
+    @FXML private void onLogout() throws IOException {
         // existing logout logic...
+        JSONObject json = new JSONObject();
+        json.put("username", SessionManager.getInstance().getUsername());
+        json.put("token", SessionManager.getInstance().getToken());
+        ApiClient.post("/auth/logout", json.toString());
+        SceneManager.switchTo("login.fxml");
+;
+
     }
 
     @FXML private void onWeeklyClicked() {
