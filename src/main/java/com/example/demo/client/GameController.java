@@ -17,9 +17,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class GameController implements Initializable {
     String playerName = "";
@@ -65,6 +63,12 @@ public class GameController implements Initializable {
     @FXML private Text winnerText;
     @FXML private Text scoreText;
 
+    private static final Map<String, Image> imageCache = new HashMap<>();
+
+    private Image getCachedImage(String path) {
+        return imageCache.computeIfAbsent(path, p -> new Image(getClass().getResourceAsStream(p)));
+    }
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -72,7 +76,7 @@ public class GameController implements Initializable {
         System.out.println(playerName);
         topContainer.setMaxHeight(CARD_HEIGHT + 20);
         bottomContainer.setMaxHeight(CARD_HEIGHT + 20);
-        backCardImage.setImage(new Image(getClass().getResourceAsStream("/images/uno_card-back.png")));
+        backCardImage.setImage(getCachedImage("/images/uno_card-back.png"));
         backCardImage.setFitWidth(CARD_WIDTH);
         backCardImage.setFitHeight(CARD_HEIGHT);
         backCardImage.setStyle("-fx-cursor: hand;");
@@ -186,7 +190,7 @@ public class GameController implements Initializable {
         winner= json2.getString("winner");
         updateGameColorIndicator(gameColor);
         System.out.println("Game Color " + gameColor);
-        pileImage.setImage(new Image(getClass().getResourceAsStream(json2.getString("pileTopImagePath"))));
+        pileImage.setImage(getCachedImage(json2.getString("pileTopImagePath")));
         pileImage.setFitWidth(CARD_WIDTH);
         pileImage.setFitHeight(CARD_HEIGHT);
 
@@ -211,7 +215,7 @@ public class GameController implements Initializable {
     }
 
     private ImageView createCardImageView(String path, double rotation, boolean isClickable, int index) {
-        ImageView iv = new ImageView(new Image(getClass().getResourceAsStream(path)));
+        ImageView iv = new ImageView(getCachedImage(path));
         iv.setFitWidth(CARD_WIDTH);
         iv.setFitHeight(CARD_HEIGHT);
         iv.setPreserveRatio(true);
@@ -306,7 +310,7 @@ public class GameController implements Initializable {
 
     private void setDirection(boolean counterclockwise) {
         String imagePath = counterclockwise ? "/images/arrow_ccw.png" : "/images/arrow_cw.png";
-        directionImage.setImage(new Image(getClass().getResourceAsStream(imagePath)));
+        directionImage.setImage(getCachedImage(imagePath));
         directionImage.setPreserveRatio(true);
         directionImage.setSmooth(true);
     }
