@@ -23,8 +23,8 @@
         <VBox fx:id="topContainer" alignment="CENTER" spacing="10"
               minHeight="160" prefHeight="200" maxHeight="340">
             <HBox fx:id="topHand" alignment="CENTER" spacing="10" />
-<!--            <ToggleButton fx:id="unoToggleTop" text="Top: UNO!" disable="true"-->
-<!--                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />-->
+            <!--            <ToggleButton fx:id="unoToggleTop" text="Top: UNO!" disable="true"-->
+            <!--                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />-->
             <Text text="" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
         </VBox>
     </top>
@@ -32,8 +32,8 @@
     <!-- Bottom: Player hand and UNO toggle -->
     <bottom>
         <VBox alignment="CENTER" spacing="5">
-<!--            <ToggleButton fx:id="unoTogglePlayer" text="You: UNO!" onAction="#onUnoTogglePlayer"-->
-<!--                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />-->
+            <!--            <ToggleButton fx:id="unoTogglePlayer" text="You: UNO!" onAction="#onUnoTogglePlayer"-->
+            <!--                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />-->
             <HBox fx:id="bottomContainer" alignment="CENTER" spacing="20"
                   minHeight="160" prefHeight="180" maxHeight="260">
                 <padding>
@@ -87,76 +87,37 @@
                     style="-fx-fill: red;"
                     StackPane.alignment="TOP_CENTER"
                     translateY="10"/>
+            <!-- TOP UNO indicator, just below dotTop -->
+                <Circle fx:id="unoIndicatorTop" radius="20" style="-fx-fill: yellow; -fx-stroke-width: 2;" StackPane.alignment="TOP_CENTER"  translateX="-50" translateY="20"/>
+                <Text text="UNO" style="-fx-fill: black; -fx-font-weight: bold; -fx-font-size: 14px;" StackPane.alignment="TOP_CENTER" translateX="-50" translateY="30"/>
+
             <Circle fx:id="dotRight"
                     radius="15"
                     style="-fx-fill: red;"
                     StackPane.alignment="CENTER_RIGHT"
                     translateX="-15"/>
+            <!-- TOP UNO indicator, just below dotTop -->
+                <Circle fx:id="unoIndicatorRight" radius="20" style="-fx-fill: yellow; -fx-stroke-width: 2;" StackPane.alignment="CENTER_RIGHT"  translateX="-25" translateY="40"/>
+                <Text text="UNO" style="-fx-fill: black -fx-font-weight: bold; -fx-font-size: 14px;" StackPane.alignment="CENTER_RIGHT" translateX="-30" translateY="40"/>
+
             <Circle fx:id="dotBottom"
                     radius="15"
                     style="-fx-fill: red;"
                     StackPane.alignment="BOTTOM_CENTER"
                     translateY="-10"/>
+
+            <Circle fx:id="unoIndicatorBottom" radius="20" style="-fx-fill: yellow; -fx-stroke-width: 2;" StackPane.alignment="BOTTOM_CENTER"  translateX="-50" translateY="-20"/>
+            <Text text="UNO" style="-fx-fill: black; -fx-font-weight: bold; -fx-font-size: 14px;" StackPane.alignment="BOTTOM_CENTER" translateX="-50" translateY="-30"/>
+
+
             <Circle fx:id="dotLeft"
                     radius="15"
                     style="-fx-fill: red;"
                     StackPane.alignment="CENTER_LEFT"
                     translateX="15"/>
 
-            <!-- UNO indicators -->
-            <StackPane fx:id="unoIndicatorTop"
-                       visible="false"
-                       managed="false"
-                       mouseTransparent="true"
-                       pickOnBounds="false"
-                       StackPane.alignment="TOP_CENTER"
-                       translateY="250">
-                <Circle radius="20"
-                        style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;"
-                        mouseTransparent="true"/>
-                <Text text="UNO"
-                      style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"
-                      mouseTransparent="true"/>
-            </StackPane>
-
-            <StackPane fx:id="unoIndicatorRight"
-                       visible="false" managed="false"
-                       mouseTransparent="true"
-                       StackPane.alignment="CENTER_RIGHT"
-                       translateX="205">
-                <Circle radius="20"
-                        style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;"
-                        mouseTransparent="true"/>
-                <Text text="UNO"
-                      style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"
-                      mouseTransparent="true"/>
-            </StackPane>
-
-            <StackPane fx:id="unoIndicatorBottom"
-                       visible="false" managed="false"
-                       mouseTransparent="true"
-                       StackPane.alignment="BOTTOM_CENTER"
-                       translateY="-250">
-                <Circle radius="20"
-                        style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;"
-                        mouseTransparent="true"/>
-                <Text text="UNO"
-                      style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"
-                      mouseTransparent="true"/>
-            </StackPane>
-
-            <StackPane fx:id="unoIndicatorLeft"
-                       visible="false" managed="false"
-                       mouseTransparent="true"
-                       StackPane.alignment="CENTER_LEFT"
-                       translateX="250">
-                <Circle radius="20"
-                        style="-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;"
-                        mouseTransparent="true"/>
-                <Text text="UNO"
-                      style="-fx-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"
-                      mouseTransparent="true"/>
-            </StackPane>
+            <Circle fx:id="unoIndicatorLeft" radius="20" style="-fx-fill: yellow; -fx-stroke-width: 2;" StackPane.alignment="CENTER_LEFT"  translateX="25" translateY="40"/>
+            <Text text="UNO" style="-fx-fill: black; -fx-font-weight: bold; -fx-font-size: 14px;" StackPane.alignment="CENTER_LEFT" translateX="30" translateY="40"/>
 
 
 
@@ -174,8 +135,8 @@
                     <Insets top="10" right="0" bottom="10" left="10"/>
                 </padding>
             </VBox>
-<!--            <ToggleButton fx:id="unoToggleLeft" text="Left: UNO!" disable="true"-->
-<!--                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />-->
+            <!--            <ToggleButton fx:id="unoToggleLeft" text="Left: UNO!" disable="true"-->
+            <!--                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />-->
             <VBox fx:id="bottomLeftButtons" spacing="10">
                 <padding>
                     <Insets top="10" right="10" bottom="10" left="10"/>
@@ -189,8 +150,8 @@
     <!-- Right: Right opponent hand and UNO toggle -->
     <right>
         <VBox alignment="CENTER_RIGHT" spacing="10">
-<!--            <ToggleButton fx:id="unoToggleRight" text="Right: UNO!" disable="true"-->
-<!--                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />-->
+            <!--            <ToggleButton fx:id="unoToggleRight" text="Right: UNO!" disable="true"-->
+            <!--                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />-->
             <VBox fx:id="rightHand" alignment="CENTER" spacing="10"
                   minWidth="160" prefWidth="180" maxWidth="260">
                 <padding>

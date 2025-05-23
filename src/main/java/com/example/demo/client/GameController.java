@@ -30,10 +30,10 @@ public class GameController implements Initializable {
     @FXML private HBox topHand;
     @FXML private ImageView pileImage;
     @FXML private ImageView backCardImage;
-    @FXML private StackPane unoIndicatorTop;
-    @FXML private StackPane unoIndicatorRight;
-    @FXML private StackPane unoIndicatorBottom;
-    @FXML private StackPane unoIndicatorLeft;
+    @FXML private Circle unoIndicatorTop;
+    @FXML private Circle unoIndicatorRight;
+    @FXML private Circle unoIndicatorBottom;
+    @FXML private Circle unoIndicatorLeft;
     @FXML private ImageView directionImage;
     @FXML private Region gameColorIndicator;
     @FXML private VBox colorPicker;
@@ -282,32 +282,66 @@ public class GameController implements Initializable {
 
 
     private void applySpacing() {
-        adjustSpacingHBox(playerHand, playerCards.size());
-        adjustSpacingHBox(topHand, topOpponentCards.size());
-        adjustSpacingVBox(leftHand, leftOpponentCards.size());
-        adjustSpacingVBox(rightHand, rightOpponentCards.size());
+        // Use Platform.runLater to ensure layout is updated before calculating spacing
+        Platform.runLater(() -> {
+            adjustSpacingHBox(playerHand, playerCards.size());
+            adjustSpacingHBox(topHand, topOpponentCards.size());
+            adjustSpacingVBox(leftHand, leftOpponentCards.size());
+            adjustSpacingVBox(rightHand, rightOpponentCards.size());
+        });
     }
 
     private void adjustSpacingHBox(HBox box, int count) {
-        if (count < 2) return;
-        double regionWidth = box.getWidth();
+        if (count < 2) {
+            box.setSpacing(10); // Default spacing for single cards
+            return;
+        }
+
+        // Use a fixed reference width instead of relying on dynamic width
+        double availableWidth = Math.min(MAX_HAND_WIDTH, 580); // Use consistent reference width
         double totalCardWidth = count * CARD_WIDTH;
-        double spacing = (totalCardWidth <= Math.min(regionWidth, MAX_HAND_WIDTH))
-                ? 10
-                : (Math.min(regionWidth, MAX_HAND_WIDTH) - CARD_WIDTH) / (count - 1) - CARD_WIDTH;
+
+        double spacing;
+        if (totalCardWidth <= availableWidth) {
+            // Cards fit comfortably - use default spacing
+            spacing = 10;
+        } else {
+            // Cards need to overlap - calculate negative spacing
+            spacing = (availableWidth - CARD_WIDTH) / (count - 1) - CARD_WIDTH;
+            // Ensure minimum spacing to prevent cards from overlapping too much
+            spacing = Math.max(spacing, -CARD_WIDTH * 0.8); // Allow max 80% overlap
+        }
+
         box.setSpacing(spacing);
     }
 
     private void adjustSpacingVBox(VBox box, int count) {
-        if (count < 2) return;
-        double regionHeight = box.getHeight();
+        if (count < 2) {
+            box.setSpacing(10); // Default spacing for single cards
+            return;
+        }
+
+        // Use a fixed reference height instead of relying on dynamic height
+        double availableHeight = 400; // Fixed reference height for vertical hands
         double totalCardHeight = count * CARD_HEIGHT;
-        double spacing = (totalCardHeight <= regionHeight)
-                ? 10
-                : (regionHeight - CARD_HEIGHT) * 1.3 / (count - 1) - CARD_HEIGHT;
+
+        double spacing;
+        if (totalCardHeight <= availableHeight) {
+            // Cards fit comfortably - use default spacing
+            spacing = 10;
+        } else {
+            // Cards need to overlap - calculate negative spacing
+            spacing = (availableHeight - CARD_HEIGHT) / (count - 1) - CARD_HEIGHT;
+            // Ensure minimum spacing to prevent cards from overlapping too much
+            spacing = Math.max(spacing, -CARD_HEIGHT * 0.8); // Allow max 80% overlap
+        }
+
         box.setSpacing(spacing);
     }
 
+    // Also update your updateGameState method to call applySpacing at the end:
+// In updateGameState(), after adding all cards, make sure to call:
+// applySpacing(); // This should be the last line in updateGameState()
     private void setDirection(boolean counterclockwise) {
         String imagePath = counterclockwise ? "/images/arrow_ccw.png" : "/images/arrow_cw.png";
         directionImage.setImage(getCachedImage(imagePath));
