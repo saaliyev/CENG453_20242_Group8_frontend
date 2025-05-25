@@ -10,11 +10,13 @@ public class RegisterController {
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private PasswordField confirmPasswordField;
+    @FXML private TextField emailField;
     @FXML private Text messageText;
 
     @FXML
     private void onRegister() {
         String username = usernameField.getText();
+        String email = emailField.getText();
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
@@ -26,6 +28,7 @@ public class RegisterController {
         JSONObject json = new JSONObject();
         json.put("username", username);
         json.put("password", password);
+        json.put("email", email);
 
         try {
             String response = ApiClient.post("/auth/register", json.toString());

@@ -31,12 +31,16 @@ public class GameController implements Initializable {
     @FXML private ImageView pileImage;
     @FXML private ImageView backCardImage;
     @FXML private Circle unoIndicatorTop;
+    @FXML private Text unoIndicatorTopText;
     @FXML private Circle unoIndicatorRight;
+    @FXML private Text unoIndicatorRightText;
     @FXML private Circle unoIndicatorBottom;
+    @FXML private Text unoIndicatorBottomText;
     @FXML private Circle unoIndicatorLeft;
+    @FXML private Text unoIndicatorLeftText;
     @FXML private ImageView directionImage;
     @FXML private Region gameColorIndicator;
-    @FXML private VBox colorPicker;
+    @FXML private GridPane colorPicker;
     private boolean gameEnded= false;
     private int turn=0;
     private String winner= "";
@@ -133,6 +137,7 @@ public class GameController implements Initializable {
         Thread gameStatePollingThread = new Thread(() -> {
 
                 String lastResponse = null;
+//                gameEnded = true;
                 while (!gameEnded) {
                     try {
                         String newResponse = ApiClient.get("/game/state");
@@ -232,7 +237,8 @@ public class GameController implements Initializable {
             JSONObject json = new JSONObject();
             json.put("playerName", playerName);
             json.put("actionType", index);
-
+                colorPicker.setVisible(false);
+                colorPicker.setManaged(false);
                 if (path.endsWith("uno_card-wildchange.png")) {
 
                     Index= index;
@@ -520,13 +526,14 @@ public class GameController implements Initializable {
 
 
     public void updateUnoIndicators(int bottomCount, int leftCount, int topCount, int rightCount) {
-        unoIndicatorTop.setVisible(topCount == 1);
-
-        unoIndicatorRight.setVisible(rightCount == 1);
-
-        unoIndicatorBottom.setVisible(bottomCount == 1);
-
-        unoIndicatorLeft.setVisible(leftCount == 1);
+        unoIndicatorTop.setVisible(bottomCount == 1);
+        unoIndicatorTopText.setVisible(bottomCount == 1);
+        unoIndicatorRight.setVisible(leftCount == 1);
+        unoIndicatorRightText.setVisible(leftCount == 1);
+        unoIndicatorBottom.setVisible(topCount == 1);
+        unoIndicatorBottomText.setVisible(topCount == 1);
+        unoIndicatorLeft.setVisible(rightCount == 1);
+        unoIndicatorLeftText.setVisible(rightCount == 1);
     }
 
 }
