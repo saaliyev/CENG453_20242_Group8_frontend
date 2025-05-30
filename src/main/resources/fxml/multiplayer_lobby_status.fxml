@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.demo.client.MultiplayerLobbyStatusController"
+            prefWidth="800" prefHeight="600"
+            style="-fx-background-color: #1e1e1e; -fx-padding: 30;">
+
+    <top>
+        <Label text="Lobby Status"
+               style="-fx-font-size: 32px; -fx-text-fill: white;"
+               BorderPane.alignment="CENTER"/>
+    </top>
+
+    <center>
+        <VBox spacing="20" alignment="CENTER">
+            <Label fx:id="playerCountLabel"
+                   text="Current Players: 0 / 4"
+                   style="-fx-text-fill: white; -fx-font-size: 20px;" />
+            <ListView fx:id="playerListView" prefHeight="200" prefWidth="300" />
+            <Button fx:id="startGameButton"
+                    text="Start Game"
+                    onAction="#handleStartGame"
+                    visible="false" />
+        </VBox>
+    </center>
+</BorderPane>

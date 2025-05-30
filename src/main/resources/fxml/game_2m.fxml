@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.Button?>
+<!--<?import javafx.scene.control.ToggleButton?>-->
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.layout.GridPane?>
+
+<!-- Wrap everything in a StackPane to allow overlay -->
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.example.demo.client.GameController_2m"
+           prefWidth="900" prefHeight="700"
+           style="-fx-background-image: url('/images/table2.png');
+                  -fx-background-size: cover;
+                  -fx-background-repeat: no-repeat;
+                  -fx-background-position: center center;">
+
+
+<BorderPane fx:id="rootPane"
+                style="-fx-background-color: transparent;"
+                prefWidth="900" prefHeight="700">
+
+        <!-- Top: Top opponent hand and title -->
+        <top>
+            <VBox fx:id="topContainer" alignment="CENTER" spacing="10"
+                  minHeight="160" prefHeight="200" maxHeight="340">
+                <HBox fx:id="topHand" alignment="CENTER" spacing="10" />
+                <!--            <ToggleButton fx:id="unoToggleTop" text="Top: UNO!" disable="true"-->
+                <!--                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />-->
+                <Text text="" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+            </VBox>
+        </top>
+
+        <!-- Bottom: Player hand and UNO toggle -->
+        <bottom>
+            <VBox alignment="CENTER" spacing="5">
+                <!--            <ToggleButton fx:id="unoTogglePlayer" text="You: UNO!" onAction="#onUnoTogglePlayer"-->
+                <!--                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />-->
+                <HBox fx:id="bottomContainer" alignment="CENTER" spacing="20"
+                      minHeight="160" prefHeight="180" maxHeight="260">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+                    <HBox fx:id="playerHand" alignment="CENTER" spacing="10" HBox.hgrow="ALWAYS" />
+                </HBox>
+            </VBox>
+        </bottom>
+
+        <center>
+            <StackPane fx:id="centerStack" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" alignment="CENTER">
+
+                <!-- Game UI -->
+                <VBox alignment="CENTER" spacing="10">
+                    <GridPane fx:id="colorPicker" alignment="CENTER" hgap="10" vgap="10" visible="false" managed="false" translateY="-50" translateX="-300">
+                        <Button text="Red"    GridPane.rowIndex="0" GridPane.columnIndex="0"
+                                style="-fx-background-color: red;    -fx-text-fill: white;" onAction="#onColorRed"/>
+                        <Button text="Yellow" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                style="-fx-background-color: yellow; -fx-text-fill: black;" onAction="#onColorYellow"/>
+                        <Button text="Green"  GridPane.rowIndex="1" GridPane.columnIndex="0"
+                                style="-fx-background-color: green;  -fx-text-fill: white;" onAction="#onColorGreen"/>
+                        <Button text="Blue"   GridPane.rowIndex="1" GridPane.columnIndex="1"
+                                style="-fx-background-color: blue;   -fx-text-fill: white;" onAction="#onColorBlue"/>
+                    </GridPane>
+
+
+                    <ImageView fx:id="directionImage"
+                               fitWidth="60" fitHeight="60"
+                               style="-fx-effect: dropshadow(gaussian, black, 4, 0.5, 0, 0);" />
+                    <HBox alignment="CENTER" spacing="20">
+                        <ImageView fx:id="backCardImage" />
+                        <StackPane alignment="CENTER">
+                            <ImageView fx:id="pileImage" />
+                        </StackPane>
+                        <Region fx:id="gameColorIndicator"
+                                prefWidth="30" prefHeight="30"
+                                style="-fx-background-color: gray;
+                           -fx-border-color: black;
+                           -fx-border-radius: 5;
+                           -fx-background-radius: 5;" />
+                    </HBox>
+                </VBox>
+
+                <!-- Dots for player positions -->
+                <Circle fx:id="dotTop"
+                        radius="15"
+                        style="-fx-fill: #00FFFF;"
+                        StackPane.alignment="TOP_CENTER"
+                        translateY="10"/>
+                <!-- TOP UNO indicator, just below dotTop -->
+                <Circle fx:id="unoIndicatorTop" radius="20" style="-fx-fill: yellow; -fx-stroke-width: 2;" StackPane.alignment="TOP_CENTER"  translateX="-50" translateY="20" visible="false"/>
+                <Text fx:id="unoIndicatorTopText" text="UNO" style="-fx-fill: black; -fx-font-weight: bold; -fx-font-size: 14px;" StackPane.alignment="TOP_CENTER" translateX="-50" translateY="30" visible="false"/>
+
+<!--                <Circle fx:id="dotRight"-->
+<!--                        radius="15"-->
+<!--                        style="-fx-fill: #00FFFF;"-->
+<!--                        StackPane.alignment="CENTER_RIGHT"-->
+<!--                        translateX="-15"/>-->
+<!--                &lt;!&ndash; TOP UNO indicator, just below dotTop &ndash;&gt;-->
+<!--                <Circle fx:id="unoIndicatorRight" radius="20" style="-fx-fill: yellow; -fx-stroke-width: 2;" StackPane.alignment="CENTER_RIGHT"  translateX="-25" translateY="40" visible="false"/>-->
+<!--                <Text fx:id="unoIndicatorRightText" text="UNO" style="-fx-fill: black -fx-font-weight: bold; -fx-font-size: 14px;" StackPane.alignment="CENTER_RIGHT" translateX="-30" translateY="40" visible="false"/>-->
+
+              <Circle fx:id="dotBottom"
+                        radius="15"
+                        style="-fx-fill: #00FFFF;"
+                        StackPane.alignment="BOTTOM_CENTER"
+                        translateY="-10"/>
+
+                <Circle fx:id="unoIndicatorBottom" radius="20" style="-fx-fill: yellow; -fx-stroke-width: 2;" StackPane.alignment="BOTTOM_CENTER"  translateX="-50" translateY="-20" visible="false"/>
+                <Text fx:id="unoIndicatorBottomText" text="UNO" style="-fx-fill: black; -fx-font-weight: bold; -fx-font-size: 14px;" StackPane.alignment="BOTTOM_CENTER" translateX="-50" translateY="-30" visible="false"/>
+
+
+<!--                <Circle fx:id="dotLeft"-->
+<!--                        radius="15"-->
+<!--                        style="-fx-fill: #00FFFF;"-->
+<!--                        StackPane.alignment="CENTER_LEFT"-->
+<!--                        translateX="15"/>-->
+
+<!--                <Circle fx:id="unoIndicatorLeft" radius="20" style="-fx-fill: yellow; -fx-stroke-width: 2;" StackPane.alignment="CENTER_LEFT"  translateX="25" translateY="40" visible="false"/>-->
+<!--                <Text fx:id="unoIndicatorLeftText" text="UNO" style="-fx-fill: black; -fx-font-weight: bold; -fx-font-size: 14px;" StackPane.alignment="CENTER_LEFT" translateX="30" translateY="40" visible="false"/>-->
+
+
+
+            </StackPane>
+
+        </center>
+
+
+        <!-- Left: Left opponent hand and player action buttons -->
+<!--        <left>-->
+<!--            <VBox alignment="CENTER_LEFT" spacing="10">-->
+<!--                <VBox fx:id="leftHand" alignment="CENTER" spacing="10"-->
+<!--                      minWidth="160" prefWidth="180" maxWidth="460">-->
+<!--                    <padding>-->
+<!--                        <Insets top="10" right="0" bottom="10" left="10"/>-->
+<!--                    </padding>-->
+<!--                </VBox>-->
+<!--                &lt;!&ndash;            <ToggleButton fx:id="unoToggleLeft" text="Left: UNO!" disable="true"&ndash;&gt;-->
+<!--                &lt;!&ndash;                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />&ndash;&gt;-->
+<!--                <VBox fx:id="bottomLeftButtons" spacing="10">-->
+<!--                    <padding>-->
+<!--                        <Insets top="10" right="10" bottom="10" left="10"/>-->
+<!--                    </padding>-->
+
+
+<!--                </VBox>-->
+<!--            </VBox>-->
+<!--        </left>-->
+
+        <!-- Right: Right opponent hand and UNO toggle -->
+<!--        <right>-->
+<!--            <VBox alignment="CENTER_RIGHT" spacing="10">-->
+<!--                &lt;!&ndash;            <ToggleButton fx:id="unoToggleRight" text="Right: UNO!" disable="true"&ndash;&gt;-->
+<!--                &lt;!&ndash;                          style="-fx-font-weight: bold; -fx-background-color: red; -fx-text-fill: white;" />&ndash;&gt;-->
+<!--                <VBox fx:id="rightHand" alignment="CENTER" spacing="10"-->
+<!--                      minWidth="160" prefWidth="180" maxWidth="260">-->
+<!--                    <padding>-->
+<!--                        <Insets top="10" right="10" bottom="10" left="0"/>-->
+<!--                    </padding>-->
+<!--                </VBox>-->
+<!--            </VBox>-->
+<!--        </right>-->
+
+
+    </BorderPane>
+
+    <!-- Game Over Overlay - now properly centered over the entire screen -->
+    <VBox fx:id="gameOverOverlay"
+          alignment="CENTER"
+          visible="false"
+          style="-fx-background-color: rgba(253,252,252,0.7);"
+          spacing="20"
+          StackPane.alignment="CENTER">
+        <Text fx:id="winnerText"
+              style="-fx-fill: red; -fx-font-size: 48px; -fx-font-weight: bold;"/>
+        <Text fx:id="scoreText"
+              style="-fx-fill: red; -fx-font-size: 36px; -fx-font-weight: bold;"/>
+    </VBox>
+
+</StackPane>

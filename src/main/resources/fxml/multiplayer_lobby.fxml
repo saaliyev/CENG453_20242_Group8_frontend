@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<?import javafx.collections.FXCollections?>
+<?import java.lang.Integer?>
+<BorderPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.demo.client.MultiplayerLobbyController"
+            prefWidth="800" prefHeight="600"
+            style="-fx-background-color: #202020; -fx-padding: 30;">
+
+    <!-- Top title -->
+    <top>
+        <Label text="Multiplayer Lobby"
+               style="-fx-font-size: 36px; -fx-text-fill: white;"
+               BorderPane.alignment="CENTER"/>
+    </top>
+
+    <!-- Center content -->
+    <center>
+        <VBox alignment="CENTER" spacing="20">
+            <!-- Game Creation -->
+            <VBox spacing="10">
+                <Label text="Create a Game" style="-fx-text-fill: white; -fx-font-size: 20px;" />
+                <HBox spacing="10" alignment="CENTER">
+                    <Label text="Select Player Count:" style="-fx-text-fill: white;" />
+                    <ChoiceBox fx:id="playerCountChoiceBox">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <Integer fx:value="2" />
+                                <Integer fx:value="3" />
+                                <Integer fx:value="4" />
+                            </FXCollections>
+                        </items>
+                    </ChoiceBox>
+                    <Button text="Create Game" onAction="#handleCreateGame" />
+                </HBox>
+            </VBox>
+
+            <Separator />
+
+            <!-- Game Join -->
+            <VBox spacing="10">
+                <Label text="Join a Game" style="-fx-text-fill: white; -fx-font-size: 20px;" />
+                <HBox spacing="10" alignment="CENTER">
+                    <Label text="Host Name:" style="-fx-text-fill: white;" />
+                    <TextField fx:id="hostNameField" promptText="Enter host name" />
+                    <Button text="Join Game" onAction="#handleJoinGame" />
+                </HBox>
+            </VBox>
+
+            <Separator />
+
+            <!-- Lobby Area -->
+        </VBox>
+    </center>
+</BorderPane>
