@@ -69,6 +69,18 @@ public class MultiplayerLobbyStatusController {
         playerCountLabel.setText("Current Players: " + currentPlayers + " / " + maxPlayers);
         playerListView.getItems().setAll(playerNames);
         startGameButton.setVisible(currentPlayers == maxPlayers);
+
+        // Print all player names to the console
+        System.out.println("Players in the lobby:");
+        for (int i = 0; i < playerNames.size(); i++) {
+            String name = playerNames.get(i);
+            System.out.println("- " + name);
+
+            if (name.equals(playerName)) {
+                SessionManager.getInstance().saveTurn(i);
+                System.out.println("Player with name "+ playerName + " and index " + i + " has joined the lobby");
+            }
+        }
     }
 
     @FXML

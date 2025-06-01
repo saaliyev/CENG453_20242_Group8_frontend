@@ -4,6 +4,7 @@ public class SessionManager {
     private static SessionManager instance;
     private String username;
     private String token;
+    private int turn;
     private SessionManager() {}
 
     public static SessionManager getInstance() {
@@ -16,6 +17,13 @@ public class SessionManager {
     public void saveSession(String username, String token) {
         this.username = username;
         this.token = token;
+    }
+    public void saveTurn(int turn){
+        this.turn = turn;
+    }
+
+    public int getTurn() {
+        return turn;
     }
 
     public String getToken() {

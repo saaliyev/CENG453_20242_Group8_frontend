@@ -41,9 +41,10 @@ public class GameController_2m implements Initializable {
     @FXML private VBox challengeMenu; // New FXML element for the challenge menu
     private String wildDrawFourPlayerName; // This field should be populated by the backend
     private String challengeBaseCardImagePath;
-    private boolean gameEnded= false;
+    private volatile boolean gameEnded= false;
     private boolean challengePending= false;
     private int turn=0;
+    private int turn_additive=-0;
     private int winnerScore=0;
     private String winner= "";
     private int score=0;
@@ -77,6 +78,7 @@ public class GameController_2m implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
         playerName= SessionManager.getInstance().getUsername();
+        turn_additive= SessionManager.getInstance().getTurn();
         System.out.println(playerName);
         topContainer.setMaxHeight(CARD_HEIGHT + 20);
         bottomContainer.setMaxHeight(CARD_HEIGHT + 20);
@@ -121,43 +123,65 @@ public class GameController_2m implements Initializable {
         });
 
         // Start polling game state in a background thread
-        scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(() -> {
-            if (!gameEnded) {
+        Thread gameStatePollingThread = new Thread(() -> {
+
+            String lastResponse = null;
+            while (!gameEnded) {
                 try {
                     String newResponse = ApiClient.get("/game/getState?playerName=" + playerName);
-                    JSONObject jsonState = new JSONObject(newResponse);
+                    System.out.println(newResponse);
+                    if (!newResponse.equals(lastResponse)) {
+                        lastResponse = newResponse;
+                        JSONObject jsonState = new JSONObject(newResponse);
+                        updateGameState(jsonState);
 
-                    Platform.runLater(() -> {
-                        try {
-                            updateGameState(jsonState);
-                        } catch (Exception e) {
-                            System.out.println("Failed to update game state: " + e.getMessage());
-                        }
-                    });
-                } catch (IOException e) {
-                    System.out.println("Polling error: " + e.getMessage());
-                }
-            } else {
-                shutdownScheduler();
-
-                Platform.runLater(() -> {
-                    winnerText.setText("Winner is: " + winner);
-                    try {
-                        String newResponse = ApiClient.get("/game/getScore");
-                        int score = Integer.parseInt(newResponse.trim());
-                        scoreText.setText("Score is: " + score);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
                     }
-
-                    gameOverOverlay.setVisible(true);
-                    PauseTransition pause = new PauseTransition(Duration.seconds(4));
-                    pause.setOnFinished(event -> SceneManager.switchTo("/lobby.fxml"));
-                    pause.play();
-                });
+                    Thread.sleep(1000); // 1 second polling interval
+                } catch (IOException | InterruptedException e) {
+                    System.out.println("Polling error: " + e.getMessage());
+                    break;
+                }
             }
-        }, 0, 1, TimeUnit.SECONDS);
+
+            Platform.runLater(() -> {
+                // Only show overlay if the current scene is still the game scene
+                if (rootPane.getScene() != null && rootPane.getScene().getRoot() == rootPane) {
+                    winnerText.setText("Winner is: " + winner);
+                    String newResponse = null;
+                    try {
+                        newResponse = ApiClient.get("/game/getScore");
+                    } catch (IOException e) {
+                        // Log and handle the error, but don't prevent scene switch
+                        System.err.println("Error getting score: " + e.getMessage());
+                    }
+                    if (newResponse != null) {
+                        try {
+                            int score = Integer.parseInt(newResponse.trim());
+                            scoreText.setText("Score is: " + score);
+                        } catch (NumberFormatException e) {
+                            System.err.println("Invalid score format: " + newResponse);
+                        }
+                    } else {
+                        scoreText.setText("Score: N/A");
+                    }
+                    gameOverOverlay.setVisible(true);
+                }
+
+                PauseTransition pause = new PauseTransition(Duration.seconds(4));
+                pause.setOnFinished(event -> {
+                    // Before switching, it's good practice to ensure resources are cleaned up
+                    shutdownScheduler(); // If you use a ScheduledExecutorService elsewhere
+                    // (You don't have one explicitly started for polling in this snippet,
+                    // but it's a good general cleanup method)
+                    SceneManager.switchTo("/lobby.fxml");
+                });
+                pause.play();
+            });
+
+        });
+        gameStatePollingThread.setDaemon(true);
+        gameStatePollingThread.start();
+
     }
 
     private void shutdownScheduler() {
@@ -191,30 +215,28 @@ public class GameController_2m implements Initializable {
             ImageView cardView = createCardImageView(path, 0, true, i);
             playerHand.getChildren().add(cardView);
         }
-        for (int i = 1; i < sizes.size(); i++) {
-            Integer size = sizes.get(i);
-            for (int j = 0; j < size; j++){
-                ImageView cardView = createCardImageView("/images/uno_card-back.png", 0, false, -1);
-                topHand.getChildren().add(cardView);
-            }
+        Integer size = sizes.get((turn_additive+1)%2);
+        for (int j = 0; j < size; j++){
+            ImageView cardView = createCardImageView("/images/uno_card-back.png", 0, false, -1);
+            topHand.getChildren().add(cardView);
         }
 
         turn= json2.getInt("turn");
-        updateTurnIndicators(turn);
-        updateUnoIndicators(sizes.get(0), sizes.get(1));
-        applySpacing();
 
         // Condition to show challenge menu:
         // challengePending is true AND
         // the current player is the one affected by the +4 (i.e., their turn has just started after the +4 was played),
         // and the playerName matches the wildDrawFourPlayerName (meaning it's *your* turn to decide on the challenge)
-        if (challengePending && !wildDrawFourPlayerName.isEmpty() && !playerName.equals(wildDrawFourPlayerName) && turn == 1) { // Assuming 'turn == 0' is the current player's turn
+        if (challengePending && !wildDrawFourPlayerName.isEmpty() && !playerName.equals(wildDrawFourPlayerName) && (turn== turn_additive)) { // Assuming 'turn == 0' is the current player's turn
             challengeMenu.setVisible(true);
             challengeMenu.setManaged(true);
         } else {
             challengeMenu.setVisible(false);
             challengeMenu.setManaged(false);
         }
+        updateTurnIndicators(turn);
+        updateUnoIndicators(sizes.get(0), sizes.get(1));
+        applySpacing();
     }
 
     private ImageView createCardImageView(String path, double rotation, boolean isClickable, int index) {
@@ -392,7 +414,7 @@ public class GameController_2m implements Initializable {
         dotTop.setOpacity(0);
         dotBottom.setOpacity(0);
 
-        switch (turn) {
+        switch ((turn+turn_additive)%2*2) {
             case 0:
                 dotBottom.setOpacity(1);
                 break;
@@ -404,10 +426,19 @@ public class GameController_2m implements Initializable {
 
 
     public void updateUnoIndicators(int bottomCount,  int topCount) {
-        unoIndicatorTop.setVisible(topCount == 1); // Check for the top opponent's hand size
-        unoIndicatorTopText.setVisible(topCount == 1); // Check for the top opponent's hand size
-        unoIndicatorBottom.setVisible(bottomCount == 1); // Check for the player's hand size
-        unoIndicatorBottomText.setVisible(bottomCount == 1); // Check for the player's hand size
+        if(turn_additive==0){
+            unoIndicatorTop.setVisible(topCount == 1); // Check for the top opponent's hand size
+            unoIndicatorTopText.setVisible(topCount == 1); // Check for the top opponent's hand size
+            unoIndicatorBottom.setVisible(bottomCount == 1); // Check for the player's hand size
+            unoIndicatorBottomText.setVisible(bottomCount == 1); // Check for the player's hand size
+        }
+        else{
+            unoIndicatorTop.setVisible(bottomCount == 1); // Check for the top opponent's hand size
+            unoIndicatorTopText.setVisible(bottomCount == 1); // Check for the top opponent's hand size
+            unoIndicatorBottom.setVisible(topCount == 1); // Check for the player's hand size
+            unoIndicatorBottomText.setVisible(topCount == 1); // Check for the player's hand size
+        }
+
     }
 
     // --- New Methods for Challenge Menu ---
