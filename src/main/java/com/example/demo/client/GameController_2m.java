@@ -41,7 +41,7 @@ public class GameController_2m implements Initializable {
     @FXML private VBox challengeMenu; // New FXML element for the challenge menu
     private String wildDrawFourPlayerName; // This field should be populated by the backend
     private String challengeBaseCardImagePath;
-    private volatile boolean gameEnded= false;
+    private boolean gameEnded= false;
     private boolean challengePending= false;
     private int turn=0;
     private int turn_additive=-0;
@@ -133,8 +133,13 @@ public class GameController_2m implements Initializable {
                     if (!newResponse.equals(lastResponse)) {
                         lastResponse = newResponse;
                         JSONObject jsonState = new JSONObject(newResponse);
-                        updateGameState(jsonState);
-
+                        Platform.runLater(() -> {
+                            try {
+                                updateGameState(jsonState);
+                            } catch (Exception e) {
+                                System.out.println("Failed to update game state: " + e.getMessage());
+                            }
+                        });
                     }
                     Thread.sleep(1000); // 1 second polling interval
                 } catch (IOException | InterruptedException e) {
@@ -144,37 +149,21 @@ public class GameController_2m implements Initializable {
             }
 
             Platform.runLater(() -> {
-                // Only show overlay if the current scene is still the game scene
-                if (rootPane.getScene() != null && rootPane.getScene().getRoot() == rootPane) {
-                    winnerText.setText("Winner is: " + winner);
-                    String newResponse = null;
-                    try {
-                        newResponse = ApiClient.get("/game/getScore");
-                    } catch (IOException e) {
-                        // Log and handle the error, but don't prevent scene switch
-                        System.err.println("Error getting score: " + e.getMessage());
-                    }
-                    if (newResponse != null) {
-                        try {
-                            int score = Integer.parseInt(newResponse.trim());
-                            scoreText.setText("Score is: " + score);
-                        } catch (NumberFormatException e) {
-                            System.err.println("Invalid score format: " + newResponse);
-                        }
-                    } else {
-                        scoreText.setText("Score: N/A");
-                    }
-                    gameOverOverlay.setVisible(true);
+                winnerText.setText("Winner is: " + winner); // implement getWinnerName()
+                String newResponse = null;
+                try {
+                    newResponse = ApiClient.get("/game/getScore");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
+                int score = Integer.parseInt(newResponse.trim());
+                scoreText.setText("Score is: " + score);  // implement getWinnerScore()
+
+
+                gameOverOverlay.setVisible(true);
 
                 PauseTransition pause = new PauseTransition(Duration.seconds(4));
-                pause.setOnFinished(event -> {
-                    // Before switching, it's good practice to ensure resources are cleaned up
-                    shutdownScheduler(); // If you use a ScheduledExecutorService elsewhere
-                    // (You don't have one explicitly started for polling in this snippet,
-                    // but it's a good general cleanup method)
-                    SceneManager.switchTo("/lobby.fxml");
-                });
+                pause.setOnFinished(event -> SceneManager.switchTo("/lobby.fxml"));
                 pause.play();
             });
 

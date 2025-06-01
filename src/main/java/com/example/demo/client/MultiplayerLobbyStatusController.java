@@ -46,6 +46,7 @@ public class MultiplayerLobbyStatusController {
                     String gameStatus = json.getString("gameStatus");
                     System.out.println(gameStatus);
                     if(gameStatus.equals("started")) {
+                        stopPolling();
                         Platform.runLater(() -> {
                             SceneManager.switchTo("game_2m.fxml");
                         });
