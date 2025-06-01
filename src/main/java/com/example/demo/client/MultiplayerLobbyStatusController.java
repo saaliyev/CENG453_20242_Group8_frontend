@@ -47,9 +47,15 @@ public class MultiplayerLobbyStatusController {
                     System.out.println(gameStatus);
                     if(gameStatus.equals("started")) {
                         stopPolling();
-                        Platform.runLater(() -> {
-                            SceneManager.switchTo("game_2m.fxml");
-                        });
+                        if(maxPlayers==2) {
+
+                        }
+                        else if(maxPlayers==4) {
+                            Platform.runLater(() -> {
+                                SceneManager.switchTo("game_4" +
+                                        "m.fxml");
+                            });
+                        }
                     }
                     JSONArray namesArray = json.getJSONArray("playerNames");
 
