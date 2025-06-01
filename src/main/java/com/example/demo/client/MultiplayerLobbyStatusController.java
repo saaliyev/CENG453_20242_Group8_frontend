@@ -52,8 +52,14 @@ public class MultiplayerLobbyStatusController {
                         }
                         else if(maxPlayers==4) {
                             Platform.runLater(() -> {
-                                SceneManager.switchTo("game_4" +
-                                        "m.fxml");
+                                SceneManager.switchTo("game_4m" +
+                                        ".fxml");
+                            });
+                        }
+                        else if(maxPlayers==3) {
+                            Platform.runLater(() -> {
+                                SceneManager.switchTo("game_3m" +
+                                        ".fxml");
                             });
                         }
                     }
