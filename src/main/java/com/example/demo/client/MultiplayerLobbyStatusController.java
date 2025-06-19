@@ -48,7 +48,10 @@ public class MultiplayerLobbyStatusController {
                     if(gameStatus.equals("started")) {
                         stopPolling();
                         if(maxPlayers==2) {
-
+                            Platform.runLater(() -> {
+                                SceneManager.switchTo("game_new" +
+                                        ".fxml");
+                            });
                         }
                         else if(maxPlayers==4) {
                             Platform.runLater(() -> {

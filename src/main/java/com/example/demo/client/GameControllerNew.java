@@ -19,7 +19,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 
-public class GameController_3m implements Initializable {
+public class GameControllerNew implements Initializable {
     private ScheduledExecutorService scheduler;
     String playerName = "";
     @FXML private BorderPane rootPane;
@@ -27,7 +27,6 @@ public class GameController_3m implements Initializable {
     @FXML private HBox bottomContainer;
 
     @FXML private HBox playerHand;
-    @FXML private VBox rightHand;
     @FXML private HBox topHand;
     @FXML private ImageView pileImage;
     @FXML private ImageView backCardImage;
@@ -35,8 +34,6 @@ public class GameController_3m implements Initializable {
     @FXML private Text unoIndicatorTopText;
     @FXML private Circle unoIndicatorBottom;
     @FXML private Text unoIndicatorBottomText;
-    @FXML private Circle unoIndicatorRight;
-    @FXML private Text unoIndicatorRightText;
     @FXML private ImageView directionImage;
     @FXML private Region gameColorIndicator;
     @FXML private GridPane colorPicker;
@@ -61,11 +58,9 @@ public class GameController_3m implements Initializable {
     private List<Integer> sizes = new ArrayList<>();
     private List<String> playerCards = List.of();
     private List<String> topOpponentCards = List.of();
-    private List<String> rightOpponentCards = List.of();
     private int Index=0;
     @FXML private Circle dotTop;
     @FXML private Circle dotBottom;
-    @FXML private Circle dotRight;
 
     @FXML private VBox gameOverOverlay;
     @FXML private Text winnerText;
@@ -203,7 +198,6 @@ public class GameController_3m implements Initializable {
         // Clear all hands
         playerHand.getChildren().clear();
         topHand.getChildren().clear();
-        rightHand.getChildren().clear();
 
         // Add cards to player's hand (bottom = self)
         for (int i = 0; i < playerCards.size(); i++) {
@@ -213,15 +207,9 @@ public class GameController_3m implements Initializable {
         }
 
         // Offsets from self (turn_additive) to UI positions
-        int rightIndex = (turn_additive + 1) % 3;
-        int topIndex = (turn_additive + 2) % 3;
+        int topIndex = (turn_additive + 1) % 2;
 
         // Add card backs for opponents
-        for (int i = 0; i < sizes.get(rightIndex); i++) {
-            ImageView cardView = createCardImageView("/images/uno_card-back.png", 90, false, -1);
-            rightHand.getChildren().add(cardView);
-            System.out.println("right");
-        }
         for (int i = 0; i < sizes.get(topIndex); i++) {
             ImageView cardView = createCardImageView("/images/uno_card-back.png", 180, false, -1);
             topHand.getChildren().add(cardView);
@@ -370,12 +358,10 @@ public class GameController_3m implements Initializable {
             adjustSpacingHBox(playerHand, playerCards.size());
 
             // Calculate opponent indices based on turn order
-            int rightIndex = (turn_additive + 1) % 3;
-            int topIndex = (turn_additive + 2) % 3;
+            int topIndex = (turn_additive + 1) % 2;
 
             // Apply spacing for AI opponents using their card counts
             adjustSpacingHBox(topHand, sizes.get(topIndex));
-            adjustSpacingVBox(rightHand, sizes.get(rightIndex));
         });
     }
 
@@ -461,11 +447,10 @@ public class GameController_3m implements Initializable {
 
         // Reset all indicators
         dotBottom.setOpacity(0);
-        dotRight.setOpacity(0);
         dotTop.setOpacity(0);
 
         // Map the actual turn to a relative position from the perspective of the current player (turn_additive)
-        int relativeTurn = (turn - turn_additive + 3) % 3;
+        int relativeTurn = (turn - turn_additive + 2) % 2;
 
         // Set indicator based on position
         switch (relativeTurn) {
@@ -473,9 +458,6 @@ public class GameController_3m implements Initializable {
                 dotBottom.setOpacity(1);
                 break;
             case 1:
-                dotRight.setOpacity(1);
-                break;
-            case 2:
                 dotTop.setOpacity(1);
                 break;
         }
@@ -486,20 +468,15 @@ public class GameController_3m implements Initializable {
     public void updateUnoIndicators(List<Integer> sizes) {
         // Indices relative to turn_additive (self)
         int bottomIndex = turn_additive;
-        int rightIndex = (turn_additive + 1) % 3;
-        int topIndex = (turn_additive + 2) % 3;
+        int topIndex = (turn_additive + 1) % 2;
 
         // Get hand sizes
         int bottomCount = sizes.get(bottomIndex);
-        int rightCount = sizes.get(rightIndex);
         int topCount = sizes.get(topIndex);
 
         // Show/hide indicators
         unoIndicatorBottom.setVisible(bottomCount == 1);
         unoIndicatorBottomText.setVisible(bottomCount == 1);
-
-        unoIndicatorRight.setVisible(rightCount == 1);
-        unoIndicatorRightText.setVisible(rightCount == 1);
 
         unoIndicatorTop.setVisible(topCount == 1);
         unoIndicatorTopText.setVisible(topCount == 1);
